@@ -1,0 +1,11 @@
+2019-09-11 17:06:18,080 [INFO] Created log file
+2019-09-11 17:06:18,269 [INFO] Building cells.
+2019-09-11 17:06:18,284 [INFO] Building recurrent connections
+2019-09-11 17:06:18,296 [INFO] Running simulation for 2000.000 ms with the time step 0.100 ms
+2019-09-11 17:06:18,296 [INFO] Starting timestep: 0 at t_sim: 0.000 ms
+2019-09-11 17:06:18,296 [INFO] Block save every 5000 steps
+2019-09-11 17:06:19,301 [INFO]     step:5000 t_sim:500.00 ms
+2019-09-11 17:06:20,333 [INFO]     step:10000 t_sim:1000.00 ms
+2019-09-11 17:06:21,359 [INFO]     step:15000 t_sim:1500.00 ms
+2019-09-11 17:06:22,371 [INFO]     step:20000 t_sim:2000.00 ms
+2019-09-11 17:06:22,387 [INFO] Simulation completed in 4.091 seconds 

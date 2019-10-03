@@ -1,0 +1,2 @@
+node_type_id cell_name model_template model_type potental morphology
+100 Cell_A hoc:IzhiCell_BC biophysical exc blank.swc

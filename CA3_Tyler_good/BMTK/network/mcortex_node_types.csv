@@ -1,0 +1,2 @@
+node_type_id morphology cell_name model_template model_type potental
+100  Cell_A hoc:CA3PyramidalCell biophysical exc

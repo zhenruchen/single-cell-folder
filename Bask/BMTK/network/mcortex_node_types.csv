@@ -1,0 +1,2 @@
+node_type_id dynamics_params potental model_type model_template morphology cell_name
+100 fit_parameters.json exc biophysical ctdb:Biophys1.hoc reconstruction.swc Cell_A

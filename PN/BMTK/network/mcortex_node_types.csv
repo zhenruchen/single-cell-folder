@@ -1,0 +1,2 @@
+node_type_id cell_name model_template morphology potental model_type
+100 Cell_PN hoc:Cell_PN  exc biophysical
