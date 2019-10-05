@@ -1,0 +1,33 @@
+{
+  "manifest": {
+    "$BASE_DIR": "${configdir}",
+    "$NETWORK_DIR": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/network",
+    "$COMPONENTS_DIR": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/PN_IClamp/components"
+  },
+  "components": {
+    "biophysical_neuron_models_dir": "$COMPONENTS_DIR/biophysical_neuron_models",
+    "point_neuron_models_dir": "$COMPONENTS_DIR/point_neuron_models",
+    "templates_dir": "$COMPONENTS_DIR/templates",
+    "synaptic_models_dir": "$COMPONENTS_DIR/synaptic_models",
+    "morphologies_dir": "$COMPONENTS_DIR/morphologies",
+    "mechanisms_dir": "$COMPONENTS_DIR/mechanisms"
+  },
+  "networks": {
+    "nodes": [
+      {
+        "node_types_file": "$NETWORK_DIR/mcortex_node_types.csv",
+        "nodes_file": "$NETWORK_DIR/mcortex_nodes.h5"
+      },
+      {
+        "nodes_file": "$NETWORK_DIR/mthalamus_nodes.h5",
+        "node_types_file": "$NETWORK_DIR/mthalamus_node_types.csv"
+      }
+    ],
+    "edges": [
+      {
+        "edge_types_file": "$NETWORK_DIR/mthalamus_mcortex_edge_types.csv",
+        "edges_file": "$NETWORK_DIR/mthalamus_mcortex_edges.h5"
+      }
+    ]
+  }
+}

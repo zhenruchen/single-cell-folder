@@ -1,2 +1,2 @@
-node_type_id model_type model_template cell_name morphology potental
-100 biophysical hoc:IzhiCell_OLM Cell_A  exc
+node_type_id model_template potental morphology model_type cell_name
+100 hoc:IzhiCell_OLM exc  biophysical Cell_A

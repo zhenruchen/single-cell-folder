@@ -1,0 +1,8 @@
+node_type_id morphology model_template model_type pop_name
+100 blank.swc hoc:IzhiCell_EC biophysical EC
+101 blank.swc hoc:IzhiCell_CA3 biophysical CA3e
+102 blank.swc hoc:IzhiCell_OLM biophysical CA3o
+103 blank.swc hoc:IzhiCell_BC biophysical CA3b
+104 blank.swc hoc:IzhiCell_GC biophysical DGg
+105 blank.swc hoc:IzhiCell_OLM biophysical DGh
+106 blank.swc hoc:IzhiCell_BC biophysical DGb

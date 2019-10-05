@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* VECTORIZED */
 #define NRN_VECTORIZED 1
 #include <stdio.h>
@@ -141,6 +141,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern Prop* nrn_point_prop_;
  static int _pointtype;
  static void* _hoc_create_pnt(_ho) Object* _ho; { void* create_point_process();
@@ -251,7 +260,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "mossy",
  "initW",
  "Cdur_nmda",
@@ -394,6 +403,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
 	 _hoc_create_pnt, _hoc_destroy_pnt, _member_func);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 68, 3);
   hoc_register_dparam_semantics(_mechtype, 0, "area");
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
@@ -403,7 +416,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 mossy /home/mizzou/Desktop/backup/BLA_SingleCells-master/CA3_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/mossy.mod\n");
+ 	ivoc_help("help ?1 mossy /home/mizzou/Desktop/single-cell-folder/CA3_Tyler_good/BMTK/PN_IClamp/components/mechanisms/x86_64/mossy.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -518,7 +531,7 @@ static int _ode_spec1(_threadargsproto_);
  i_ampa = W_ampa * g_ampa * ( v - Erev_ampa ) * ( aACH + ( bACH * ( ACH - 1.0 ) ) ) * ( aDA + ( bDA * ( DA - 1.0 ) ) ) * R * u * facfactor ;
  ICa = P0 * g_nmda * ( v - ECa ) * sfunc ( _threadargscomma_ v ) ;
  DCapoolcon = DCapoolcon  / (1. - dt*( ( ( ( - 1.0 ) ) ) / tauCa )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  static int release (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) { {
@@ -858,4 +871,256 @@ _first = 0;
 
 #if defined(__cplusplus)
 } /* extern "C" */
+#endif
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/home/mizzou/Desktop/single-cell-folder/CA3_Tyler_good/BMTK/PN_IClamp/components/mechanisms/modfiles/mossy.mod";
+static const char* nmodl_file_text = 
+  "NEURON {\n"
+  "	POINT_PROCESS mossy\n"
+  "	NONSPECIFIC_CURRENT i_nmda, i_ampa\n"
+  "	RANGE initW\n"
+  "	RANGE Cdur_nmda, AlphaTmax_nmda, Beta_nmda, Erev_nmda, gbar_nmda, W_nmda, on_nmda, g_nmda\n"
+  "	RANGE Cdur_ampa, AlphaTmax_ampa, Beta_ampa, Erev_ampa, gbar_ampa, W_ampa, on_ampa, g_ampa\n"
+  "	RANGE ECa, ICa, P0, fCa, tauCa, iCatotal\n"
+  "	RANGE Cainf, pooldiam, z\n"
+  "	RANGE lambda1, lambda2, threshold1, threshold2\n"
+  "	RANGE fmax, fmin, Wmax, Wmin, maxChange, normW, scaleW\n"
+  "	RANGE pregid,postgid\n"
+  "	\n"
+  "	:Added by Ali\n"
+  "	RANGE U,tauRec, tauF,R,u, facfactor, fa\n"
+  "	RANGE aACH, bACH, aDA, bDA, wACH, wDA, calcium\n"
+  "}\n"
+  "\n"
+  "UNITS {\n"
+  "	(mV) = (millivolt)\n"
+  "        (nA) = (nanoamp)\n"
+  "	(uS) = (microsiemens)\n"
+  "	FARADAY = 96485 (coul)\n"
+  "	pi = 3.141592 (1)\n"
+  "}\n"
+  "\n"
+  "PARAMETER {\n"
+  ": parameters are vars assigned by user or changed by hoc. THey appear in nrnpointmenu\n"
+  "	initW = 5\n"
+  "\n"
+  "	Cdur_nmda = 17.58 (ms)\n"
+  "	AlphaTmax_nmda = .08 (/ms)\n"
+  "	Beta_nmda = 0.008 (/ms)\n"
+  "	Erev_nmda = 0 (mV)\n"
+  "	gbar_nmda = .6e-3 (uS)\n"
+  "\n"
+  "	Cdur_ampa = 5.31 (ms)\n"
+  "	AlphaTmax_ampa = 0.117 (/ms)\n"
+  "	Beta_ampa = 0.072 (/ms)\n"
+  "	Erev_ampa = 0 (mV)\n"
+  "	gbar_ampa = 1.7e-3 (uS)\n"
+  "\n"
+  "	ECa = 120\n"
+  "\n"
+  "	Cainf = 50e-6 (mM)\n"
+  "	pooldiam =  1.8172 (micrometer)\n"
+  "	z = 2\n"
+  "\n"
+  "	tauCa = 50 (ms)\n"
+  "	P0 = .015\n"
+  "	fCa = .024\n"
+  "\n"
+  "	lambda1 = 2.5\n"
+  "	lambda2 = .01\n"
+  "	threshold1 = 0.5 (uM)\n"
+  "	threshold2 = 0.6 (uM)\n"
+  "\n"
+  "	fmax = 3\n"
+  "	fmin = .8\n"
+  "\n"
+  "	:Added by Ali\n"
+  "	ACH = 1\n"
+  "	DA = 1\n"
+  "	LearningShutDown = 1\n"
+  "\n"
+  "	tauRec = 1\n"
+  "	tauF = 1\n"
+  "	U = 0.1      :\"Utilization\" factor of available transmitter\n"
+  "	facfactor = 10\n"
+  "		\n"
+  "	aACH = 1\n"
+  "	bACH = 0\n"
+  "	wACH = 0\n"
+  "	aDA = 1\n"
+  "	bDA = 0\n"
+  "	wDA = 0\n"
+  "\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {\n"
+  ": These are vars calculated by Neuron hoc or by the mechanism mod itself\n"
+  "	v (mV)\n"
+  "\n"
+  "	i_nmda (nA)\n"
+  "	g_nmda (uS)\n"
+  "	on_nmda\n"
+  "	W_nmda\n"
+  "\n"
+  "	i_ampa (nA)\n"
+  "	g_ampa (uS)\n"
+  "	on_ampa\n"
+  "	W_ampa\n"
+  "\n"
+  "	t0 (ms)\n"
+  "\n"
+  "	ICa (mA)\n"
+  "	Afactor	(mM/ms/nA)\n"
+  "	iCatotal (mA)\n"
+  "\n"
+  "	dW_ampa\n"
+  "	Wmax\n"
+  "	Wmin\n"
+  "	maxChange\n"
+  "	normW\n"
+  "	scaleW\n"
+  "	\n"
+  "	pregid\n"
+  "	postgid\n"
+  "	\n"
+  "	:Added by Ali\n"
+  "		calcium\n"
+  "		u\n"
+  "		R\n"
+  "		tLast\n"
+  "		fa\n"
+  "}\n"
+  "\n"
+  "STATE { r_nmda r_ampa Capoolcon }\n"
+  "\n"
+  "INITIAL {\n"
+  "	on_nmda = 0\n"
+  "	r_nmda = 0\n"
+  "	W_nmda = initW\n"
+  "\n"
+  "	on_ampa = 0\n"
+  "	r_ampa = 0\n"
+  "	W_ampa = initW\n"
+  "\n"
+  "	t0 = -1\n"
+  "\n"
+  "	:Wmax = fmax*initW\n"
+  "	:Wmin = fmin*initW\n"
+  "	maxChange = (Wmax-Wmin)/10\n"
+  "	dW_ampa = 0\n"
+  "\n"
+  "	Capoolcon = Cainf\n"
+  "	Afactor	= 1/(z*FARADAY*4/3*pi*(pooldiam/2)^3)*(1e6)\n"
+  "	\n"
+  "	:Added by Ali\n"
+  "		tLast = -1e30\n"
+  "		u= U\n"
+  "		R=1-u\n"
+  "	fa =0\n"
+  "}\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE release METHOD cnexp\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE release {\n"
+  "	if (t0>0) {\n"
+  "		if (t-t0 < Cdur_nmda) {\n"
+  "			on_nmda = 1\n"
+  "		} else {\n"
+  "			on_nmda = 0\n"
+  "		}\n"
+  "		if (t-t0 < Cdur_ampa) {\n"
+  "			on_ampa = 1\n"
+  "		} else {\n"
+  "			on_ampa = 0\n"
+  "		}\n"
+  "	}\n"
+  "	r_nmda' = AlphaTmax_nmda*on_nmda*(1-r_nmda) -Beta_nmda*r_nmda\n"
+  "	r_ampa' = AlphaTmax_ampa*on_ampa*(1-r_ampa) -Beta_ampa*r_ampa\n"
+  "\n"
+  "	dW_ampa = eta(Capoolcon)*(lambda1*omega(Capoolcon, threshold1, threshold2)-lambda2*W_ampa)*dt\n"
+  "\n"
+  "	: Limit for extreme large weight changes\n"
+  "	if (fabs(dW_ampa) > maxChange) {\n"
+  "		if (dW_ampa < 0) {\n"
+  "			dW_ampa = -1*maxChange\n"
+  "		} else {\n"
+  "			dW_ampa = maxChange\n"
+  "		}\n"
+  "	}\n"
+  "\n"
+  "	:Normalize the weight change\n"
+  "	normW = (W_ampa-Wmin)/(Wmax-Wmin)\n"
+  "	if (dW_ampa < 0) {\n"
+  "		scaleW = sqrt(fabs(normW))\n"
+  "	} else {\n"
+  "		scaleW = sqrt(fabs(1.0-normW))\n"
+  "	}\n"
+  "\n"
+  "	W_ampa = W_ampa + dW_ampa*scaleW *(1+ (wACH * (ACH - 1))) * LearningShutDown\n"
+  "	\n"
+  "	:Weight value limits\n"
+  "	if (W_ampa > Wmax) { \n"
+  "		W_ampa = Wmax\n"
+  "	} else if (W_ampa < Wmin) {\n"
+  " 		W_ampa = Wmin\n"
+  "	}\n"
+  "\n"
+  "	g_nmda = gbar_nmda*r_nmda\n"
+  "	i_nmda = W_nmda*g_nmda*(v - Erev_nmda)*sfunc(v) *R*u * facfactor :/1.5\n"
+  "\n"
+  "	g_ampa = gbar_ampa*r_ampa\n"
+  "	i_ampa = W_ampa*g_ampa*(v - Erev_ampa)  * (aACH + (bACH * (ACH-1)))*(aDA + (bDA * (DA-1))) *R*u * facfactor :/1.5\n"
+  "\n"
+  "	ICa = P0*g_nmda*(v - ECa)*sfunc(v)\n"
+  "	Capoolcon'= -fCa*Afactor*ICa + (Cainf-Capoolcon)/tauCa\n"
+  "}\n"
+  "\n"
+  "NET_RECEIVE(dummy_weight) {\n"
+  "	t0 = t\n"
+  "	\n"
+  "	:Added by Ali, Synaptic facilitation\n"
+  "	:R = R*(1 - u)*exp((t-tLast)/-tauRec)+ 1 - exp((t-tLast)/-tauRec) \n"
+  "	:u = u*exp((t-tLast)/-tauF)+U*(1-u*exp((t-tLast)/-tauF))\n"
+  ":fa = R*u * facfactor * ((R*u ) * facfactor)\n"
+  "\n"
+  "	:MF\n"
+  "	u = 5* u * exp((t-tLast)/-tauF) + 0.05 \n"
+  "		\n"
+  "	if (u > 3) {\n"
+  "	u = 3\n"
+  "	}\n"
+  "	tLast = t    : Storing the most recent spike time\n"
+  "}\n"
+  "\n"
+  ":::::::::::: FUNCTIONs and PROCEDUREs ::::::::::::\n"
+  "\n"
+  "FUNCTION sfunc (v (mV)) {\n"
+  "	UNITSOFF\n"
+  "	sfunc = 1/(1+0.33*exp(-0.06*v))\n"
+  "	UNITSON\n"
+  "}\n"
+  "\n"
+  "FUNCTION eta(Cani (mM)) {\n"
+  "	LOCAL taulearn, P1, P2, P4, Cacon\n"
+  "	P1 = 0.1\n"
+  "	P2 = P1*1e-4\n"
+  "	P4 = 1\n"
+  "	Cacon = Cani*1e3\n"
+  "	taulearn = P1/(P2+Cacon*Cacon*Cacon)+P4\n"
+  "	eta = 1/taulearn*0.001\n"
+  "}\n"
+  "\n"
+  "FUNCTION omega(Cani (mM), threshold1 (uM), threshold2 (uM)) {\n"
+  "	LOCAL r, mid, Cacon\n"
+  "	Cacon = Cani*1e3\n"
+  "	r = (threshold2-threshold1)/2\n"
+  "	mid = (threshold1+threshold2)/2\n"
+  "	if (Cacon <= threshold1) { omega = 0}\n"
+  "	else if (Cacon >= threshold2) {	omega = 1/(1+50*exp(-50*(Cacon-threshold2)))}\n"
+  "	else {omega = -sqrt(r*r-(Cacon-mid)*(Cacon-mid))}\n"
+  "}\n"
+  ;
 #endif

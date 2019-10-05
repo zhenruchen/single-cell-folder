@@ -1,0 +1,2 @@
+2019-10-04 17:52:22,213 [INFO] Created log file
+2019-10-04 17:52:22,419 [ERROR] property model_type is missing from nodes.

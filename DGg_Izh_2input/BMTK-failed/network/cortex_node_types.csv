@@ -1,0 +1,2 @@
+node_type_id morphology pop_name model_type model_template
+100 blank.swc DGg biophysical hoc:DGCell

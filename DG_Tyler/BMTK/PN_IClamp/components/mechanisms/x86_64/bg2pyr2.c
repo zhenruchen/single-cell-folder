@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* VECTORIZED */
 #define NRN_VECTORIZED 1
 #include <stdio.h>
@@ -102,6 +102,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern Prop* nrn_point_prop_;
  static int _pointtype;
  static void* _hoc_create_pnt(_ho) Object* _ho; { void* create_point_process();
@@ -187,7 +196,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "bg2pyr2",
  "initW",
  "taun1",
@@ -270,6 +279,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
 	 _hoc_create_pnt, _hoc_destroy_pnt, _member_func);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 31, 3);
   hoc_register_dparam_semantics(_mechtype, 0, "area");
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
@@ -279,7 +292,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 bg2pyr2 /home/mizzou/Desktop/backup/BLA_SingleCells-master/CA3_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/bg2pyr2.mod\n");
+ 	ivoc_help("help ?1 bg2pyr2 /home/mizzou/Desktop/single-cell-folder/DG_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/bg2pyr2.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -328,7 +341,13 @@ static int _ode_spec1(_threadargsproto_);
  inmda = initW * gNMDAmax * gnmdas * ( v - enmda ) * sfunc ( _threadargscomma_ v ) ;
  DAa = DAa  / (1. - dt*( ( - 1.0 ) / taua1 )) ;
  DBa = DBa  / (1. - dt*( ( - 1.0 ) / taua2 )) ;
- return 0;
+ gampa = normconsta * factora * ( Ba - Aa ) ;
+ gampas = gampa ;
+ if ( gampas > 1.0 ) {
+   gampas = 1.0 ;
+   }
+ iampa = initW * gAMPAmax * gampas * ( v - eampa ) ;
+  return 0;
 }
  /*END CVODE*/
  static int states (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) { {
@@ -612,4 +631,131 @@ _first = 0;
 
 #if defined(__cplusplus)
 } /* extern "C" */
+#endif
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/home/mizzou/Desktop/single-cell-folder/DG_Tyler/BMTK/PN_IClamp/components/mechanisms/modfiles/bg2pyr2.mod";
+static const char* nmodl_file_text = 
+  ":Background to Pyramidal Cells AMPA+NMDA \n"
+  "\n"
+  "NEURON {\n"
+  "	POINT_PROCESS bg2pyr2\n"
+  "	NONSPECIFIC_CURRENT inmda\n"
+  "	NONSPECIFIC_CURRENT iampa\n"
+  "	RANGE taun1, taun2, factorn, normconstn\n"
+  "	RANGE taua1, taua2, factora, normconsta\n"
+  "	RANGE gnmda, gnmdas, gNMDAmax, enmda\n"
+  "	RANGE gampa, gampas, gAMPAmax, eampa\n"
+  "	RANGE initW\n"
+  "}\n"
+  "\n"
+  "UNITS {\n"
+  "	(mV) = (millivolt)\n"
+  "        (nA) = (nanoamp)\n"
+  "	(uS) = (microsiemens)\n"
+  "}\n"
+  "\n"
+  "PARAMETER {\n"
+  "\n"
+  "	:W\n"
+  "	initW = 1\n"
+  "\n"
+  "	:NMDA\n"
+  "	taun1 = 5 (ms)\n"
+  "	taun2 = 125 (ms)\n"
+  "	gNMDAmax = 0.5e-3 (uS)\n"
+  "	enmda = 0 (mV)\n"
+  "\n"
+  "	:AMPA\n"
+  "	taua1 = .5 (ms)\n"
+  "	taua2 = 7 (ms)\n"
+  "	gAMPAmax = 1e-3 (uS)\n"
+  "	eampa = 0 (mV)\n"
+  "	\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	v (mV)\n"
+  "	eca (mV)\n"
+  "	\n"
+  "	:NMDA\n"
+  "	inmda (nA)\n"
+  "	gnmda\n"
+  "	gnmdas\n"
+  "	factorn\n"
+  "	normconstn\n"
+  "\n"
+  "	:AMPA\n"
+  "	iampa (nA)\n"
+  "	gampa\n"
+  "	gampas\n"
+  "	factora\n"
+  "	normconsta\n"
+  "}\n"
+  "\n"
+  "STATE {\n"
+  "\n"
+  "	:NMDA\n"
+  "	An\n"
+  "	Bn\n"
+  "\n"
+  "	:AMPA\n"
+  "	Aa\n"
+  "	Ba\n"
+  "}\n"
+  "\n"
+  "INITIAL {\n"
+  "\n"
+  "	:NMDA\n"
+  "	An = 0\n"
+  "	Bn = 0\n"
+  "	factorn = taun1*taun2/(taun2-taun1)\n"
+  "	normconstn = -1/(factorn*(1/exp(log(taun2/taun1)/(taun1*(1/taun1-1/taun2)))-1/exp(log(taun2/taun1)/(taun2*(1/taun1-1/taun2)))))\n"
+  "\n"
+  "	:AMPA\n"
+  "	Aa = 0\n"
+  "	Ba = 0\n"
+  "	factora = taua1*taua2/(taua2-taua1)\n"
+  "	normconsta = -1/(factora*(1/exp(log(taua2/taua1)/(taua1*(1/taua1-1/taua2)))-1/exp(log(taua2/taua1)/(taua2*(1/taua1-1/taua2)))))\n"
+  "}\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE states METHOD cnexp\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE states {\n"
+  "\n"
+  "	:NMDA\n"
+  "	An' = -An/taun1\n"
+  "	Bn' = -Bn/taun2\n"
+  "	gnmda = normconstn*factorn*(Bn-An)\n"
+  "	gnmdas = gnmda\n"
+  "	if (gnmdas>1) {gnmdas=1}\n"
+  "	inmda = initW*gNMDAmax*gnmdas*(v-enmda)*sfunc(v)\n"
+  "\n"
+  "	:AMPA\n"
+  "	Aa' = -Aa/taua1\n"
+  "	Ba' = -Ba/taua2\n"
+  "	gampa = normconsta*factora*(Ba-Aa)\n"
+  "	gampas = gampa\n"
+  "	if (gampas > 1) {gampas = 1}\n"
+  "	iampa = initW*gAMPAmax*gampas*(v-eampa)\n"
+  "}\n"
+  "\n"
+  "NET_RECEIVE(wgt) {\n"
+  "        LOCAL x\n"
+  "	x = wgt\n"
+  "	state_discontinuity(An,An+x)\n"
+  "	state_discontinuity(Bn,Bn+x)\n"
+  "	state_discontinuity(Aa,Aa+x)\n"
+  "	state_discontinuity(Ba,Ba+x)\n"
+  "}\n"
+  "\n"
+  ":::::::::::: FUNCTIONs and PROCEDUREs ::::::::::::\n"
+  "FUNCTION sfunc (v (mV)) {\n"
+  "	UNITSOFF\n"
+  "	sfunc = 1/(1+0.33*exp(-0.06*v))\n"
+  "	UNITSON\n"
+  "}\n"
+  ;
 #endif

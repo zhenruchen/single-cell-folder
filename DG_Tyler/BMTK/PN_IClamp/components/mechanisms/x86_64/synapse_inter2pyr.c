@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* VECTORIZED */
 #define NRN_VECTORIZED 1
 #include <stdio.h>
@@ -150,6 +150,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern Prop* nrn_point_prop_;
  static int _pointtype;
  static void* _hoc_create_pnt(_ho) Object* _ho; { void* create_point_process();
@@ -276,7 +285,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "inter2pyr",
  "initW",
  "Cdur_gabaa",
@@ -432,6 +441,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
 	 _hoc_create_pnt, _hoc_destroy_pnt, _member_func);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 77, 3);
   hoc_register_dparam_semantics(_mechtype, 0, "area");
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
@@ -441,7 +454,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 inter2pyr /home/mizzou/Desktop/backup/BLA_SingleCells-master/CA3_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/synapse_inter2pyr.mod\n");
+ 	ivoc_help("help ?1 inter2pyr /home/mizzou/Desktop/single-cell-folder/DG_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/synapse_inter2pyr.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -560,7 +573,7 @@ static int _ode_spec1(_threadargsproto_);
  i_gabaa = W_gabaa * g_gabaa * ( v - Erev_gabaa ) * ( 1.0 + ( bACH * ( ACH - 1.0 ) ) ) ;
  ICa = P0b * g_gabab * ( v - ECa ) + P0a * gbar_Ca * VDCCm ( _threadargscomma_ v ) * ( v - ECa ) ;
  DCapoolcon = DCapoolcon  / (1. - dt*( ( ( ( - 1.0 ) ) ) / tauCa )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  static int release (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) { {
@@ -909,4 +922,279 @@ _first = 0;
 
 #if defined(__cplusplus)
 } /* extern "C" */
+#endif
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/home/mizzou/Desktop/single-cell-folder/DG_Tyler/BMTK/PN_IClamp/components/mechanisms/modfiles/synapse_inter2pyr.mod";
+static const char* nmodl_file_text = 
+  ": inhibitory synapses with both GABAa and GABAb\n"
+  "NEURON {\n"
+  "	POINT_PROCESS inter2pyr\n"
+  "	NONSPECIFIC_CURRENT i_gabab, i_gabaa\n"
+  "	RANGE initW\n"
+  "	RANGE Cdur_gabab, AlphaTmax_gabab, Beta_gabab, Erev_gabab, gbar_gabab, W_gabab, on_gabab, g_gabab, K3_gabab, K4_gabab, n_gabab, Kd_gabab, rr_gabab\n"
+  "	RANGE Cdur_gabaa, AlphaTmax_gabaa, Beta_gabaa, Erev_gabaa, gbar_gabaa, W_gabaa, on_gabaa, g_gabaa\n"
+  "	RANGE ECa, ICa, P0a, P0b, fCa, tauCa, iCatotal\n"
+  "	RANGE Cainf, pooldiam, z\n"
+  "	RANGE lambda1, lambda2, threshold1, threshold2\n"
+  "	RANGE fmax, fmin, Wmax, Wmin, maxChange, normW, scaleW\n"
+  "	RANGE pregid,postgid\n"
+  "	:Added by Ali\n"
+  "	RANGE F, f, tauF, D1, d1, tauD1, D2, d2, tauD2, facfactor\n"
+  "	RANGE aACH, bACH, aDA, bDA, wACH, wDA\n"
+  "}\n"
+  "\n"
+  "UNITS {\n"
+  "	(mV) = (millivolt)\n"
+  "        (nA) = (nanoamp)\n"
+  "	(uS) = (microsiemens)\n"
+  "	FARADAY = 96485 (coul)\n"
+  "	pi = 3.141592 (1)\n"
+  "}\n"
+  "\n"
+  "PARAMETER {\n"
+  "	initW = 5\n"
+  "\n"
+  "	\n"
+  "	Cdur_gabaa = 5.31 (ms)\n"
+  "	AlphaTmax_gabaa = 5000 (/ms)\n"
+  "	Beta_gabaa = 0.18(/ms) :0.072 \n"
+  "	Erev_gabaa = -75 (mV)\n"
+  "	gbar_gabaa = 1.7e-3 (uS)\n"
+  "	\n"
+  "	Cdur_gabab = 6 (ms)\n"
+  "	AlphaTmax_gabab =  0.09 (/ms mM) :.08\n"
+  "	Beta_gabab = 0.008 (/ms) :0.008 \n"
+  "	Erev_gabab = -75 (mV)\n"
+  "	gbar_gabab = 1e-3 (uS)\n"
+  "	K3_gabab = .18 (/ms) \n"
+  "	K4_gabab = .034 (/ms) \n"
+  "	n_gabab = 4\n"
+  "	Kd_gabab = 100\n"
+  "\n"
+  "	ECa = 120\n"
+  "	gbar_Ca = 18e-3 (uS)\n"
+  "	\n"
+  "	Cainf = 50e-6 (mM)\n"
+  "	pooldiam =  1.8172 (micrometer)\n"
+  "	z = 2\n"
+  "\n"
+  "\n"
+  "	tauCa = 50 (ms)\n"
+  "	P0a = .0035  : Had to lower 10 fold becaues for some reason inh synapses generated 10 folds more calcium than exitatory despite simlar levels of NMDA and GABAb.\n"
+  "	P0b = .0015\n"
+  "	fCa = .024\n"
+  "\n"
+  "	lambda1 = 2.5\n"
+  "	lambda2 = .01\n"
+  "	threshold1 = 0.2 (uM)\n"
+  "	threshold2 = 0.4 (uM)\n"
+  "\n"
+  "	:fmax = 3\n"
+  "	:fmin = .8\n"
+  "\n"
+  "	:Added by Ali\n"
+  "		ACH = 1\n"
+  "LearningShutDown = 1\n"
+  "\n"
+  "		facfactor = 1\n"
+  "	: the (1) is needed for the range limits to be effective\n"
+  "        f = 1 (1) < 0, 1e9 >    : facilitation\n"
+  "        tauF = 1 (ms) < 1e-9, 1e9 >\n"
+  "        d1 = 1 (1) < 0, 1 >     : fast depression\n"
+  "        tauD1 = 1 (ms) < 1e-9, 1e9 >\n"
+  "        d2 = 1 (1) < 0, 1 >     : slow depression\n"
+  "        tauD2 = 1 (ms) < 1e-9, 1e9 >\n"
+  "	\n"
+  "	aACH = 1\n"
+  "	bACH = 0\n"
+  "	wACH = 0\n"
+  "	aDA = 1\n"
+  "	bDA = 0\n"
+  "	wDA = 0\n"
+  "\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	v (mV)\n"
+  "\n"
+  "\n"
+  "	i_gabab (nA)\n"
+  "	g_gabab (uS)\n"
+  "	on_gabab\n"
+  "	W_gabab\n"
+  "	rr_gabab\n"
+  "\n"
+  "	i_gabaa (nA)\n"
+  "	g_gabaa (uS)\n"
+  "	on_gabaa\n"
+  "	W_gabaa\n"
+  "\n"
+  "	t0 (ms)\n"
+  "\n"
+  "	ICa (mA)\n"
+  "	Afactor	(mM/ms/nA)\n"
+  "	iCatotal (mA)\n"
+  "\n"
+  "	dW_gabaa\n"
+  "	Wmax\n"
+  "	Wmin\n"
+  "	maxChange\n"
+  "	normW\n"
+  "	scaleW\n"
+  "	\n"
+  "	pregid\n"
+  "	postgid\n"
+  "	\n"
+  "		tsyn\n"
+  "	\n"
+  "		fa\n"
+  "		F\n"
+  "		D1\n"
+  "		D2\n"
+  "}\n"
+  "\n"
+  "STATE { r_gabab s_gabab r_gabaa Capoolcon }\n"
+  "\n"
+  "INITIAL {\n"
+  "	on_gabab = 0\n"
+  "	r_gabab = 0\n"
+  "	s_gabab = 0\n"
+  "	W_gabab = initW\n"
+  "\n"
+  "	on_gabaa = 0\n"
+  "	r_gabaa = 0\n"
+  "	W_gabaa = initW\n"
+  "\n"
+  "	t0 = -1\n"
+  "\n"
+  "	:Wmax = fmax*initW\n"
+  "	:Wmin = fmin*initW\n"
+  "	maxChange = (Wmax-Wmin)/10\n"
+  "	dW_gabaa = 0\n"
+  "\n"
+  "	Capoolcon = Cainf\n"
+  "	Afactor	= 1/(z*FARADAY*4/3*pi*(pooldiam/2)^3)*(1e6)\n"
+  "	\n"
+  "	:Added by Ali		printf(\"Afactor : %g\", Afactor)\n"
+  "\n"
+  "		tsyn = -1e30\n"
+  "\n"
+  "	fa =0\n"
+  "	F = 1\n"
+  "	D1 = 1\n"
+  "	D2 = 1\n"
+  "}\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE release METHOD cnexp\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE release {\n"
+  "	if (t0>0) {\n"
+  "		if (t-t0 < Cdur_gabab) {\n"
+  "			on_gabab = 1\n"
+  "		} else {\n"
+  "			on_gabab = 0\n"
+  "		}\n"
+  "		if (t-t0 < Cdur_gabaa) {\n"
+  "			on_gabaa = 1\n"
+  "		} else {\n"
+  "			on_gabaa = 0\n"
+  "		}\n"
+  "	}\n"
+  "	r_gabab' = AlphaTmax_gabab*on_gabab*(1-r_gabab)-Beta_gabab*r_gabab\n"
+  "	s_gabab' = K3_gabab*r_gabab-K4_gabab*s_gabab\n"
+  "	r_gabaa' = AlphaTmax_gabaa*on_gabaa*(1-r_gabaa)-Beta_gabaa*r_gabaa\n"
+  "\n"
+  "	dW_gabaa = eta(Capoolcon)*(lambda1*omega(Capoolcon, threshold1, threshold2)-lambda2*W_gabaa)*dt\n"
+  "\n"
+  "	: Limit for extreme large weight changes\n"
+  "	if (fabs(dW_gabaa) > maxChange) {\n"
+  "		if (dW_gabaa < 0) {\n"
+  "			dW_gabaa = -1*maxChange\n"
+  "		} else {\n"
+  "			dW_gabaa = maxChange\n"
+  "		}\n"
+  "	}\n"
+  "\n"
+  "	:Normalize the weight change\n"
+  "	normW = (W_gabaa-Wmin)/(Wmax-Wmin)\n"
+  "	if (dW_gabaa < 0) {\n"
+  "		scaleW = sqrt(fabs(normW))\n"
+  "	} else {\n"
+  "		scaleW = sqrt(fabs(1.0-normW))\n"
+  "	}\n"
+  "\n"
+  "	W_gabaa = W_gabaa + dW_gabaa*scaleW *(1+ (wACH * (ACH - 1))) * LearningShutDown\n"
+  "	\n"
+  "	:Weight value limits\n"
+  "	if (W_gabaa > Wmax) { \n"
+  "		W_gabaa = Wmax\n"
+  "	} else if (W_gabaa < Wmin) {\n"
+  " 		W_gabaa = Wmin\n"
+  "	}\n"
+  "\n"
+  "	rr_gabab = s_gabab^n_gabab/(s_gabab^n_gabab+Kd_gabab)\n"
+  "	g_gabab = gbar_gabab*rr_gabab * facfactor\n"
+  "	i_gabab = W_gabab*g_gabab*(v - Erev_gabab) \n"
+  "\n"
+  "	g_gabaa = gbar_gabaa*r_gabaa * facfactor\n"
+  "	i_gabaa = W_gabaa*g_gabaa*(v - Erev_gabaa) * (1 + (bACH * (ACH-1)))\n"
+  "\n"
+  "		:  What is this (v- ECa ) term \n"
+  "		: the werid thing is ECa is set to 120! Is that in mv? ?\n"
+  "		: Guoshi includes only gabaa induced calcium release\n"
+  "		: So now I'm gonna be adding VDCCm (v - ECa)\n"
+  "		: if I added to the first line it is really instantanuous and won't last\n"
+  "		: if I add it to the ode then it at least will have those dynamics\n"
+  "	ICa = P0b*g_gabab*(v - ECa) + P0a * gbar_Ca*VDCCm(v) * ( v - ECa) :P0b\n"
+  " 	Capoolcon'= -fCa*Afactor*ICa + (Cainf-Capoolcon)/tauCa \n"
+  "}\n"
+  "\n"
+  "NET_RECEIVE(dummy_weight) {\n"
+  "	:Added by Ali, Synaptic facilitation\n"
+  "	F  = 1 + (F-1)* exp(-(t - tsyn)/tauF)\n"
+  "	D1 = 1 - (1-D1)*exp(-(t - tsyn)/tauD1)\n"
+  "	D2 = 1 - (1-D2)*exp(-(t - tsyn)/tauD2)\n"
+  " :printf(\"%g\\t%g\\t%g\\t%g\\t%g\\t%g\\n\", t, t-tsyn, F, D1, D2, facfactor)\n"
+  "	tsyn = t\n"
+  "	\n"
+  "	facfactor = F * D1 * D2\n"
+  "\n"
+  "	F = F * f\n"
+  "	D1 = D1 * d1\n"
+  "	D2 = D2 * d2\n"
+  ":printf(\"\\t%g\\t%g\\t%g\\n\", F, D1, D2)\n"
+  "\n"
+  "	t0 = t :Spike time for conductance openining.\n"
+  "}\n"
+  "\n"
+  ":::::::::::: FUNCTIONs and PROCEDUREs ::::::::::::\n"
+  "\n"
+  "FUNCTION eta(Cani (mM)) {\n"
+  "	LOCAL taulearn, P1, P2, P4, Cacon\n"
+  "	P1 = 0.1\n"
+  "	P2 = P1*1e-4\n"
+  "	P4 = 1\n"
+  "	Cacon = Cani*1e3\n"
+  "	taulearn = P1/(P2+Cacon*Cacon*Cacon)+P4\n"
+  "	eta = 1/taulearn*0.001\n"
+  "}\n"
+  "FUNCTION VDCCm (v (mV)) {\n"
+  "	UNITSOFF\n"
+  "	VDCCm = 1 / (1 + exp( (-4 - v)/6.3)) : Values taken from Fisher et al. 1990 from the 14pS channel group \"Properties and distribution of single voltage...\"\n"
+  "	UNITSON\n"
+  "}\n"
+  "\n"
+  "FUNCTION omega(Cani (mM), threshold1 (uM), threshold2 (uM)) {\n"
+  "	LOCAL r, mid, Cacon\n"
+  "	Cacon = Cani*1e3\n"
+  "	r = (threshold2-threshold1)/2\n"
+  "	mid = (threshold1+threshold2)/2\n"
+  "	if (Cacon <= threshold1) { omega = 0}\n"
+  "	else if (Cacon >= threshold2) {	omega = 1/(1+50*exp(-50*(Cacon-threshold2)))}\n"
+  "	else {omega = -sqrt(r*r-(Cacon-mid)*(Cacon-mid))}\n"
+  "}\n"
+  ;
 #endif

@@ -1,0 +1,213 @@
+bionet/biocell.py:184:_set_connections (edge_prop) # Edge_prop dict contains delay, model_template, dynamics_params
+    Calls nrn.py_modules.synapse_model (look into this)
+called by 
+set_syn_connection(self, edge_prop, src_node, stim=None):151
+called by 
+bionet/bionetwork.py:212:build_recurrent_edges
+    bionetwork.py._edge_populations contains edge information
+        part of SimNetwork in simulator.core.simulator_network    
+            add_edges adds to this
+                edge_population is an instance of simulator.core.edge_population.py, abstract class for bionet impl
+                    bmtk.simulator.core.sonata_reader.EdgeAdapter
+                        bmtk.simulator.bionet.sonata_adapters.BioEdge
+                        
+                        
+                        
+Turn delay into a function similar to connection_rule[method]/connection_params[dict]
+
+See from bmtk.builder.auxi.edge_connectors import distance_connector
+    (Autapses here are disabled)
+    find euclid dist between cells
+    if dist > d_max (max dist)
+        drop con
+    else
+        ratio_tomax = dist/d_max
+        weight = d_weight_max * (1-ratio_tomax) + d_weight_min *ratio_tomax
+        (if super close to furthest away, weight will be close to weight_min | if really close, it'll be close to max weight)
+    if weight <=0
+        drop con ret none
+    if random > weight
+        drop con ret none
+        
+    return a random number between nsyn_min/nsyn_max for this connection (1 if you only want one synapse per connection)
+    
+    
+    
+    
+Individual edge properties (SEE NetworkBuilder_Intro.ipynb)!!
+
+import numpy as np
+
+def syn_dist_delay(source, target, min_weight, max_weight):
+    # Do some logic here 
+    #return np.random.uniform(min_weight, max_weight)
+    distDelay = 0.1* (0.5*dist + rC.normal(0,1.5)*(1-exp(-dist^2/3)) ) 
+    
+def dist_connector(source, target, con_pattern):
+    #dx = Locs.o(postArea).x[0][m] - Locs.o(preArea).x[0][b]
+    #dy = Locs.o(postArea).x[1][m] - Locs.o(preArea).x[1][b]
+
+    #if ((Locs.o(preArea).nrow + Locs.o(postArea).nrow) > 5) {
+    #    dz = Locs.o(postArea).x[2][m] - Locs.o(preArea).x[2][b]
+    #    dist = sqrt(dx^2 + dy^2 + dz^2) 
+    #    distxy = sqrt(dx^2 + dy^2)
+    #} else {
+    #    dist = sqrt(dx^2 + dy^2)
+    #    distxy = dist
+    #}
+    
+    #// Lamellar. 
+    #    //prob = prob =	 par.x(4) /(1+(1-exp(-abs(dx)^2/3)))	
+    #// pyr-int feedback loop. Has to be the same loop. Or the same seed? Theoritically I can connect pyr to int, same #the seed and then go through the same seed and loop to connect int to pyr.  
+    #    // it shoudl be based off of interneuron axonal plexus.
+    #// Random. Turn off the dist component.
+    #    //prob = par.x(4)
+    #// Mossy  (If 30 of CA3 cells are active, then a recruited gc have a 50% chance of recruiting a new CA3 neuron)
+    #// within axonal plexus.
+    #// prob = par.x(4)/dist
+    
+    #calc dist 
+    #if (ConPattern == Lamellar) {
+    #    prob =	 par.x(4)/ (exp( ((abs(dx) -0)^2)/ (2 * (3^2)))) //par4 is ratio
+    #}
+    #if (ConPattern == Homogenous) {
+    #    prob =	 par.x(4) 			//par4 is ratio 	
+    #}
+    #if (ConPattern == IntPyrFeedback || ConPattern == AxonalPlexus) {
+    #    c = par.x(4)
+    #    a = par.x(29) //par29 is GaussA
+    #   
+    #   prob =	 a /(exp( ((abs(distxy) -0)^2)/ (2 * (c^2))))	
+    
+    ## SEE distance_connector (BMTK for additional)	
+
+conn = net.add_edges(connection_rule=dist_connector,
+                     connection_params={'con_pattern':'Lamellar'}
+                     dynamics_params='AMPA_ExcToExc.json',
+                     model_template='Exp2Syn',
+                     delay=2.0)
+
+conn.add_properties('delay', 
+                    rule=syn_dist_delay,
+                    rule_params={'min_weight': 1.0e-06, 'max_weight': 1.0e-03},
+                    dtypes=np.float)
+net.build()
+
+
+
+
+
+
+=================
+Need to add recurrent connections between CA3o and CA3e
+Need to add recurrent connections between DGh and DGh
+
+=================
+Connect MF (pre = DGg | post = CA3e)
+for each cell in DGg we want it to connect to exactly 2 different CA3 neurons
+prob = 1/ (exp( ((abs(dx) -0)^2)/ (2 * (2^2)))) // Standard deviation of 2 compared to 3 in pp projections More limited longitudianal spread
+
+
+===============================================================================
+Correlation plots (Matlab code)
+
+Will call this function based on the name of the output
+    Correlation('139full','./Outputs')
+
+norma = 1;
+cellNumbers = [30 63 384 20 20];
+areaCode = [0 1 4 7 8];
+
+StimCount = 16;
+StimSpace = 625 ;% tstop / StimCount;
+tstop = 10000;
+reference =6;
+corrEC = [];
+corrCA3 = [];
+corrDG = [];
+
+SpikeTimes = importdata([OutPath sname{1}]);
+//DETERMINE THE FORMAT OF THIS DATA IN MATLAB
+Each line is cell, time
+
+
+
+Steps:
+    1. Count the number of spikes per trial for each cell
+    2. Normalize 
+    3. Return dot product of reference point(trial 6) to all other trials
+    
+    
+[hell, cor] = ParseTrials(StimCount,=16 cellNumbers(i)=30, tstop=10000, SpikeTimes, reference=6, norma=1);
+    StimSpace = tstop/ StimCount; //10000/16
+    Define TrialNeurons array of zeros (16 by 30) for EC trials, cells
+    
+    for each of the spike times
+        trialNo = get the trial this spike was a part of by ceiling of(time cell spiked/stimspace)
+        neuronNo = get neuron that spiked/stimspace
+        
+        if the neuron we're looking at is less than the total number of neurons in that space(Shouldn't be a prob)
+            Add one to the trial and neuron that spiked
+    
+    ##So far we've just created an array of spike counts for each trial for each neuron
+    
+    Norma is set to 1 so we continue
+        for each of the Trials in TrialNeurons  
+            Trial(n,:) = TrialN(n,:)./norm(TrialN(n,:)
+            
+    cor = []
+    
+    for each of the trials
+        cor.append(dot(TrialNeurons(reference,:),TrialNeurons(t,:));
+        
+        
+    return cor
+    
+This is done for EC, CA3, DG
+
+Find the mean and std for each Trial cor
+
+Plot the bounded line for each trial, std of CA3 and DG
+
+
+    
+
++++++++++++++++++++++++++++++++++++++
+Tuning talk with Dr. Nair
+
+EC to CA3e weights need to see if they're growing
+CA3 thresh is not enough, DG is too strong..?
+
+Plot just EC
+
+
+Plot weights before and after*****
+Is there training being done
+If they aren't 
+
+EC plots to see if 
+
+With DG -> CA3 gets stronger
+So this will disrupt pattern connection
+
+EC->CA3 is where pattern is learned
+These are connections that should 
+
+Calcium 
+
+Take single CA3 cell calcium
+
+
+Bezaire has a way to see just one cell and the inputs 
+Pick just one single 
+
+Zoom into that one cell, find all cells connected and all inputs that go to it
+From those, write another data file just input spikes just to that cell,
+just to see what that single cell did, what happens if you turn off just some
+off those 
+
+Just check with Kael if there's a possiblilty 
+
+Bezaire to see if she has this? 
+
+Another question -- Can you give SET RANDOM NUMBER GENERATOR

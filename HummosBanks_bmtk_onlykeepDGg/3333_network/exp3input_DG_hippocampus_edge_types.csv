@@ -1,0 +1,2 @@
+edge_type_id target_query source_query syn_weight distance_range dynamics_params target_sections delay model_template
+100 pop_name=='DGg' pop_name=='poisson_DG' 1 "[0.0, 9999]" NetConPoisson.exc.exp3.json ['soma'] 0 pyr2pyr

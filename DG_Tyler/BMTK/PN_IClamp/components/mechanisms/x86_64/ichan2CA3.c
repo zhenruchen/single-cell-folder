@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -120,6 +120,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -192,7 +201,7 @@ static void  nrn_jacob(_NrnThread*, _Memb_list*, int);
 static int _ode_count(int);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "ichan2CA3",
  "gnatbar_ichan2CA3",
  "gkfbar_ichan2CA3",
@@ -281,6 +290,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 36, 9);
   hoc_register_dparam_semantics(_mechtype, 0, "nat_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "nat_ion");
@@ -293,7 +306,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
   hoc_register_dparam_semantics(_mechtype, 8, "ks_ion");
  	hoc_register_cvode(_mechtype, _ode_count, 0, 0, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ichan2CA3 /home/mizzou/Desktop/backup/BLA_SingleCells-master/CA3_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/ichan2CA3.mod\n");
+ 	ivoc_help("help ?1 ichan2CA3 /home/mizzou/Desktop/single-cell-folder/DG_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/ichan2CA3.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -708,3 +721,176 @@ static void _initlists() {
    _t_nstau = makevector(201*sizeof(double));
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/home/mizzou/Desktop/single-cell-folder/DG_Tyler/BMTK/PN_IClamp/components/mechanisms/modfiles/ichan2CA3.mod";
+static const char* nmodl_file_text = 
+  "TITLE ichan2.mod  \n"
+  "  \n"
+  "COMMENT\n"
+  "konduktivitas valtozas hatasa- somaban \n"
+  "ENDCOMMENT\n"
+  " \n"
+  "UNITS {\n"
+  "        (mA) =(milliamp)\n"
+  "        (mV) =(millivolt)\n"
+  "        (uF) = (microfarad)\n"
+  "	(molar) = (1/liter)\n"
+  "	(nA) = (nanoamp)\n"
+  "	(mM) = (millimolar)\n"
+  "	(um) = (micron)\n"
+  "	FARADAY = 96520 (coul)\n"
+  "	R = 8.3134	(joule/degC)\n"
+  "}\n"
+  " \n"
+  "? interface \n"
+  "NEURON { \n"
+  "SUFFIX ichan2CA3 \n"
+  "USEION nat READ enat WRITE inat VALENCE 1\n"
+  "USEION kf READ ekf WRITE ikf  VALENCE 1\n"
+  "USEION ks READ eks WRITE iks  VALENCE 1\n"
+  "NONSPECIFIC_CURRENT il \n"
+  "RANGE  gnat, gkf, gks\n"
+  "RANGE gnatbar, gkfbar, gksbar\n"
+  "RANGE gl, el\n"
+  "RANGE minf, mtau, hinf, htau, nfinf, nftau, inat, ikf, nsinf, nstau, iks\n"
+  "}\n"
+  " \n"
+  "INDEPENDENT {t FROM 0 TO 100 WITH 100 (ms)}\n"
+  " \n"
+  "PARAMETER {\n"
+  "        v (mV) \n"
+  "        celsius = 6.3 (degC)\n"
+  "        dt (ms) \n"
+  "        enat  (mV)\n"
+  "	gnatbar (mho/cm2)   \n"
+  "        ekf  (mV)\n"
+  "	gkfbar (mho/cm2)\n"
+  "        eks  (mV)\n"
+  "	gksbar (mho/cm2)\n"
+  "	gl (mho/cm2)    \n"
+  " 	el (mV)\n"
+  "}\n"
+  " \n"
+  "STATE {\n"
+  "	m h nf ns\n"
+  "}\n"
+  " \n"
+  "ASSIGNED {\n"
+  "         \n"
+  "        gnat (mho/cm2) \n"
+  "        gkf (mho/cm2)\n"
+  "        gks (mho/cm2)\n"
+  "\n"
+  "        inat (mA/cm2)\n"
+  "        ikf (mA/cm2)\n"
+  "        iks (mA/cm2)\n"
+  "\n"
+  "\n"
+  "	il (mA/cm2)\n"
+  "\n"
+  "	minf hinf nfinf nsinf\n"
+  " 	mtau (ms) htau (ms) nftau (ms) nstau (ms)\n"
+  "	mexp hexp nfexp nsexp\n"
+  "} \n"
+  "\n"
+  "? currents\n"
+  "BREAKPOINT {\n"
+  "	SOLVE states\n"
+  "        gnat = gnatbar*m*m*m*h  \n"
+  "        inat = gnat*(v - enat)\n"
+  "        gkf = gkfbar*nf*nf*nf*nf\n"
+  "        ikf = gkf*(v-ekf)\n"
+  "        gks = gksbar*ns*ns*ns*ns\n"
+  "        iks = gks*(v-eks)\n"
+  "\n"
+  "	il = gl*(v-el)\n"
+  "}\n"
+  " \n"
+  "UNITSOFF\n"
+  " \n"
+  "INITIAL {\n"
+  "	trates(v)\n"
+  "	\n"
+  "	m = minf\n"
+  "	h = hinf\n"
+  "      nf = nfinf\n"
+  "      ns = nsinf\n"
+  "	\n"
+  "	VERBATIM\n"
+  "	return 0;\n"
+  "	ENDVERBATIM\n"
+  "}\n"
+  "\n"
+  "? states\n"
+  "PROCEDURE states() {	:Computes state variables m, h, and n \n"
+  "        trates(v)	:      at the current v and dt.\n"
+  "        m = m + mexp*(minf-m)\n"
+  "        h = h + hexp*(hinf-h)\n"
+  "        nf = nf + nfexp*(nfinf-nf)\n"
+  "        ns = ns + nsexp*(nsinf-ns)\n"
+  "        VERBATIM\n"
+  "        return 0;\n"
+  "        ENDVERBATIM\n"
+  "}\n"
+  " \n"
+  "LOCAL q10\n"
+  "\n"
+  "? rates\n"
+  "PROCEDURE rates(v) {  :Computes rate and other constants at current v.\n"
+  "                      :Call once from HOC to initialize inf at resting v.\n"
+  "        LOCAL  alpha, beta, sum\n"
+  "       q10 = 3^((celsius - 6.3)/10)\n"
+  "                :\"m\" sodium activation system - act and inact cross at -40\n"
+  "	alpha = -0.3*vtrap((v+60-17),-5)\n"
+  "	beta = 0.3*vtrap((v+60-45),5)\n"
+  "	sum = alpha+beta        \n"
+  "	mtau = 1/sum      minf = alpha/sum\n"
+  "                :\"h\" sodium inactivation system\n"
+  "	alpha = 0.23/exp((v+60+5)/20)\n"
+  "	beta = 3.33/(1+exp((v+60-47.5)/-10))\n"
+  "	sum = alpha+beta\n"
+  "	htau = 1/sum \n"
+  "        hinf = alpha/sum \n"
+  "             :\"ns\" sKDR activation system\n"
+  "        alpha = -0.028*vtrap((v+65-35),-6)\n"
+  "	beta = 0.1056/exp((v+65-10)/40)\n"
+  "	sum = alpha+beta        \n"
+  "	nstau = 1/sum      nsinf = alpha/sum\n"
+  "            :\"nf\" fKDR activation system\n"
+  "        alpha = -0.07*vtrap((v+65-47),-6)\n"
+  "	beta = 0.264/exp((v+65-22)/40)\n"
+  "	sum = alpha+beta        \n"
+  "	nftau = 1/sum      nfinf = alpha/sum\n"
+  "	\n"
+  "}\n"
+  " \n"
+  "PROCEDURE trates(v) {  :Computes rate and other constants at current v.\n"
+  "                      :Call once from HOC to initialize inf at resting v.\n"
+  "	LOCAL tinc\n"
+  "        TABLE minf, mexp, hinf, hexp, nfinf, nfexp, nsinf, nsexp, mtau, htau, nftau, nstau\n"
+  "	DEPEND dt, celsius FROM -100 TO 100 WITH 200\n"
+  "                           \n"
+  "	rates(v)	: not consistently executed from here if usetable_hh == 1\n"
+  "		: so don't expect the tau values to be tracking along with\n"
+  "		: the inf values in hoc\n"
+  "\n"
+  "	       tinc = -dt * q10\n"
+  "        mexp = 1 - exp(tinc/mtau)\n"
+  "        hexp = 1 - exp(tinc/htau)\n"
+  "	nfexp = 1 - exp(tinc/nftau)\n"
+  "	nsexp = 1 - exp(tinc/nstau)\n"
+  "}\n"
+  " \n"
+  "FUNCTION vtrap(x,y) {  :Traps for 0 in denominator of rate eqns.\n"
+  "        if (fabs(x/y) < 1e-6) {\n"
+  "                vtrap = y*(1 - x/y/2)\n"
+  "        }else{  \n"
+  "                vtrap = x/(exp(x/y) - 1)\n"
+  "        }\n"
+  "}\n"
+  " \n"
+  "UNITSON\n"
+  "\n"
+  ;
+#endif

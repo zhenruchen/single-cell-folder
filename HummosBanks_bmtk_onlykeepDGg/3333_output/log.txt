@@ -1,0 +1,40 @@
+2019-04-28 18:08:20,260 [INFO] Created log file
+2019-04-28 18:08:20,860 [INFO] Building cells.
+2019-04-28 18:08:22,720 [INFO] Building recurrent connections
+2019-04-28 18:08:44,532 [INFO] Building virtual cell stimulations for spikes_poisson_DG
+2019-04-28 18:08:46,242 [INFO] Building virtual cell stimulations for spikes_input_EC
+2019-04-28 18:08:47,164 [INFO] Building virtual cell stimulations for spikes_poisson_CA3
+2019-04-28 18:08:49,263 [INFO] Running simulation for 15000.000 ms with the time step 0.100 ms
+2019-04-28 18:08:49,266 [INFO] Starting timestep: 0 at t_sim: 0.000 ms
+2019-04-28 18:08:49,270 [INFO] Block save every 5000 steps
+2019-04-28 18:09:45,199 [INFO]     step:5000 t_sim:500.00 ms
+2019-04-28 18:10:54,577 [INFO]     step:10000 t_sim:1000.00 ms
+2019-04-28 18:12:02,530 [INFO]     step:15000 t_sim:1500.00 ms
+2019-04-28 18:13:06,449 [INFO]     step:20000 t_sim:2000.00 ms
+2019-04-28 18:14:13,131 [INFO]     step:25000 t_sim:2500.00 ms
+2019-04-28 18:15:14,103 [INFO]     step:30000 t_sim:3000.00 ms
+2019-04-28 18:16:22,910 [INFO]     step:35000 t_sim:3500.00 ms
+2019-04-28 18:17:27,904 [INFO]     step:40000 t_sim:4000.00 ms
+2019-04-28 18:18:36,908 [INFO]     step:45000 t_sim:4500.00 ms
+2019-04-28 18:19:39,675 [INFO]     step:50000 t_sim:5000.00 ms
+2019-04-28 18:20:40,562 [INFO]     step:55000 t_sim:5500.00 ms
+2019-04-28 18:21:42,114 [INFO]     step:60000 t_sim:6000.00 ms
+2019-04-28 18:22:32,261 [INFO]     step:65000 t_sim:6500.00 ms
+2019-04-28 18:23:22,985 [INFO]     step:70000 t_sim:7000.00 ms
+2019-04-28 18:24:14,910 [INFO]     step:75000 t_sim:7500.00 ms
+2019-04-28 18:25:14,050 [INFO]     step:80000 t_sim:8000.00 ms
+2019-04-28 18:26:15,255 [INFO]     step:85000 t_sim:8500.00 ms
+2019-04-28 18:27:16,844 [INFO]     step:90000 t_sim:9000.00 ms
+2019-04-28 18:28:08,525 [INFO]     step:95000 t_sim:9500.00 ms
+2019-04-28 18:28:58,108 [INFO]     step:100000 t_sim:10000.00 ms
+2019-04-28 18:29:53,667 [INFO]     step:105000 t_sim:10500.00 ms
+2019-04-28 18:30:54,622 [INFO]     step:110000 t_sim:11000.00 ms
+2019-04-28 18:31:54,792 [INFO]     step:115000 t_sim:11500.00 ms
+2019-04-28 18:32:53,710 [INFO]     step:120000 t_sim:12000.00 ms
+2019-04-28 18:33:52,011 [INFO]     step:125000 t_sim:12500.00 ms
+2019-04-28 18:34:56,535 [INFO]     step:130000 t_sim:13000.00 ms
+2019-04-28 18:35:57,716 [INFO]     step:135000 t_sim:13500.00 ms
+2019-04-28 18:36:55,477 [INFO]     step:140000 t_sim:14000.00 ms
+2019-04-28 18:37:53,209 [INFO]     step:145000 t_sim:14500.00 ms
+2019-04-28 18:38:52,961 [INFO]     step:150000 t_sim:15000.00 ms
+2019-04-28 18:39:06,715 [INFO] Simulation completed in 30.0 minutes, 17.45 seconds 

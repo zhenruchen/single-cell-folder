@@ -1,0 +1,78 @@
+{
+  "target_simulator": "NEURON",
+  "run": {
+    "tstart": 0.0,
+    "tstop": 2000.0,
+    "dt": 0.1,
+    "dL": 20.0,
+    "spike_threshold": -15.0,
+    "nsteps_block": 5000
+  },
+  "conditions": {
+    "celsius": 34.0,
+    "v_init": -80.0
+  },
+  "inputs": {
+    "lgn_spikes": {
+      "input_type": "spikes",
+      "module": "csv",
+      "input_file": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/exp3_input_poisson_DG.csv",
+      "node_set": "mthalamus"
+    }
+  },
+  "output": {
+    "log_file": "log.txt",
+    "output_dir": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/output",
+    "spikes_file": "spikes.h5"
+  },
+  "reports": {
+    "v_report": {
+      "variable_name": "v",
+      "cells": "all",
+      "module": "membrane_report",
+      "sections": "soma"
+    }
+  },
+  "node_sets_file": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/node_sets.json",
+  "network": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/circuit_config.json",
+  "config_path": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/simulation_config.json",
+  "config_dir": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK",
+  "components": {
+    "biophysical_neuron_models_dir": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/components/biophysical_neuron_models",
+    "point_neuron_models_dir": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/components/point_neuron_models",
+    "templates_dir": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/components/templates",
+    "synaptic_models_dir": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/components/synaptic_models",
+    "morphologies_dir": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/components/morphologies",
+    "mechanisms_dir": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/components/mechanisms"
+  },
+  "networks": {
+    "nodes": [
+      {
+        "node_types_file": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/network/exp3input_DG_node_types.csv",
+        "nodes_file": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/network/exp3input_DG_nodes.h5"
+      },
+      {
+        "node_types_file": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/network/mcortex_node_types.csv",
+        "nodes_file": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/network/mcortex_nodes.h5"
+      },
+      {
+        "nodes_file": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/network/mthalamus_nodes.h5",
+        "node_types_file": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/network/mthalamus_node_types.csv"
+      },
+      {
+        "nodes_file": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/network/cortex_nodes.h5",
+        "node_types_file": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/network/cortex_node_types.csv"
+      }
+    ],
+    "edges": [
+      {
+        "edge_types_file": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/network/exp3input_DG_mcortex_edge_types.csv",
+        "edges_file": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/network/exp3input_DG_mcortex_edges.h5"
+      },
+      {
+        "edge_types_file": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/network/mthalamus_cortex_edge_types.csv",
+        "edges_file": "/home/mizzou/Desktop/single-cell-folder/DGg_Izh_2input/BMTK/network/mthalamus_cortex_edges.h5"
+      }
+    ]
+  }
+}

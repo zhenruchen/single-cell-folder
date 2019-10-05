@@ -1,12 +1,11 @@
 {
   "manifest": {
     "$BASE_DIR": "${configdir}",
-    "$NETWORK_DIR": "/home/mizzou/Desktop/backup/BLA_SingleCells-master/DG_Tyler/BMTK/network",
+    "$NETWORK_DIR": "/home/mizzou/Desktop/single-cell-folder/DG_Tyler/BMTK/network",
     "$COMPONENTS_DIR": "$BASE_DIR/components"
   },
   "components": {
     "biophysical_neuron_models_dir": "$COMPONENTS_DIR/biophysical_neuron_models",
-    "__pycache___dir": "$COMPONENTS_DIR/__pycache__",
     "point_neuron_models_dir": "$COMPONENTS_DIR/point_neuron_models",
     "templates_dir": "$COMPONENTS_DIR/templates",
     "synaptic_models_dir": "$COMPONENTS_DIR/synaptic_models",

@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* VECTORIZED */
 #define NRN_VECTORIZED 1
 #include <stdio.h>
@@ -95,6 +95,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern Prop* nrn_point_prop_;
  static int _pointtype;
  static void* _hoc_create_pnt(_ho) Object* _ho; { void* create_point_process();
@@ -193,7 +202,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "IZH",
  "k",
  "a",
@@ -294,6 +303,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 1, _thread_mem_init);
      _nrn_thread_reg(_mechtype, 0, _thread_cleanup);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 25, 6);
   hoc_register_dparam_semantics(_mechtype, 0, "area");
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
@@ -307,7 +320,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 IZH /home/mizzou/Desktop/backup/BLA_SingleCells-master/CA3_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/izh.mod\n");
+ 	ivoc_help("help ?1 IZH /home/mizzou/Desktop/single-cell-folder/DG_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/izh.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -339,7 +352,7 @@ static int _ode_spec1(_threadargsproto_);
 }
  static int _ode_matsol1 (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) {
  Du = Du  / (1. - dt*( ( ( a_OLM * ACHshutdown + a * alphaShutdown ) )*( ( ( - 1.0 ) ) ) )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  
@@ -626,4 +639,92 @@ _first = 0;
 
 #if defined(__cplusplus)
 } /* extern "C" */
+#endif
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/home/mizzou/Desktop/single-cell-folder/DG_Tyler/BMTK/PN_IClamp/components/mechanisms/modfiles/izh.mod";
+static const char* nmodl_file_text = 
+  "NEURON {\n"
+  "  POINT_PROCESS IZH\n"
+  "  NONSPECIFIC_CURRENT vv\n"
+  "  RANGE a,b,c,d,e,f,I,vv,thresh, vr, vt, vpeak, aACH, cACH, dACH,alphaShutdown, bACH, ACHshutdown, aMin, aMax, g, vrACH, k, Cap\n"
+  "}\n"
+  "UNITS {\n"
+  "	(mV) = (millivolt)\n"
+  "    (nA) = (nanoamp)\n"
+  "	(pA) = (picoamp)\n"
+  "	(uS) = (microsiemens)\n"
+  "	(nS) = (nanosiemens)\n"
+  "}\n"
+  "\n"
+  "INITIAL {\n"
+  "u = uinit\n"
+  "net_send(0,1)\n"
+  "}\n"
+  "\n"
+  "PARAMETER {  \n"
+  "  k = 0.0011 (nA/mV2) :(1/mV*megaohm) \n"
+  ": So pranit used pA aesthetically then divides k b d and u by 1000 to get them back to be in nA which is what neuron uses and understands for point processes.\n"
+  ": The model can still be used in nA but you have to overlook the low values\n"
+  "  a = 0.01 (1/ms)\n"
+  "  b = 0.0002 (uS)\n"
+  "  c = -65 (mV)\n"
+  "  d = .001 (nA)\n"
+  "\n"
+  " \n"
+  "  vpeak= 30 (mV)\n"
+  "  vv = 0 (mV)\n"
+  "  vr = - 70 (mV)\n"
+  "  vt = - 45 (mV)\n"
+  "\n"
+  "  a_OLM = 0.002\n"
+  "  ACH = 1 \n"
+  "  dACH = 0 (nA)\n"
+  "  cACH = 0 (mV)\n"
+  "  vrACH = 0 (mV)\n"
+  "  Cap = 1000\n"
+  "  uinit = 0 (nA)\n"
+  "	\n"
+  "  alphaShutdown = 1\n"
+  "  \n"
+  "  aMin = 0.01\n"
+  "  aMax = 0.05\n"
+  "  bACH = 1.25\n"
+  "  \n"
+  "  aACH = 0.025\n"
+  "  g = 1.333\n"
+  "  :The equations to calculate g and aACH aACH = aMin * bACH g = 1 / (bACH * (1 - (aMin/aMax)))\n"
+  "  ACHshutdown = 0\n"
+  "}\n"
+  "\n"
+  "STATE { u }\n"
+  "\n"
+  "ASSIGNED {\n"
+  "  }\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "  SOLVE states METHOD derivimplicit\n"
+  "  vv = -(k*(v - (vr + vrACH * (-1+ ACH) ))*(v - vt) - u)\n"
+  "  \n"
+  "  a_OLM = 0.023*ACH^2 - 0.022*ACH + 0.002\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE states {\n"
+  "    u' = (a_OLM * ACHshutdown + a *alphaShutdown)*(b*(v - (vr + vrACH * (-1+ ACH) ))-u)\n"
+  "	:u' =  a *(b*(v - (vr + vrACH * (-1+ ACH) ))-u)\n"
+  "    :u' = ( alphaShutdown*a +  ACHshutdown *(g * -aACH) / ((-1+ACH) - g * bACH) )*(b*(v - (vr + vrACH * (-1+ ACH) ))-u)\n"
+  "}\n"
+  "\n"
+  "NET_RECEIVE (w) {\n"
+  "  if (flag == 1) {\n"
+  "    WATCH (v>vpeak) 2\n"
+  "  } else if (flag == 2) {\n"
+  "    net_event(t)\n"
+  "    v = c + cACH * (-1+ACH) \n"
+  "    u = u+d + dACH * (1-ACH)\n"
+  "  }\n"
+  "}\n"
+  "\n"
+  "\n"
+  ;
 #endif

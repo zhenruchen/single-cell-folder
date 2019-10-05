@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -90,6 +90,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -143,7 +152,7 @@ static void  nrn_jacob(_NrnThread*, _Memb_list*, int);
 static int _ode_count(int);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "gskchCA3",
  "gskbar_gskchCA3",
  0,
@@ -212,6 +221,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 13, 6);
   hoc_register_dparam_semantics(_mechtype, 0, "sk_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "sk_ion");
@@ -221,7 +234,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
   hoc_register_dparam_semantics(_mechtype, 5, "tca_ion");
  	hoc_register_cvode(_mechtype, _ode_count, 0, 0, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 gskchCA3 /home/mizzou/Desktop/backup/BLA_SingleCells-master/CA3_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/gskchCA3.mod\n");
+ 	ivoc_help("help ?1 gskchCA3 /home/mizzou/Desktop/single-cell-folder/CA3_Tyler_good/BMTK/PN_IClamp/components/mechanisms/x86_64/gskchCA3.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -433,3 +446,102 @@ static void _initlists() {
   if (!_first) return;
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/home/mizzou/Desktop/single-cell-folder/CA3_Tyler_good/BMTK/PN_IClamp/components/mechanisms/modfiles/gskchCA3.mod";
+static const char* nmodl_file_text = 
+  "TITLE gskch.mod  calcium-activated potassium channel (non-voltage-dependent)\n"
+  " \n"
+  "COMMENT\n"
+  "\n"
+  "gsk granule\n"
+  "\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "UNITS {\n"
+  "        (molar) = (1/liter)\n"
+  "        (mM)    = (millimolar)\n"
+  "	(mA)	= (milliamp)\n"
+  "	(mV)	= (millivolt)\n"
+  "}\n"
+  "\n"
+  "NEURON {\n"
+  "	SUFFIX gskchCA3\n"
+  "	USEION sk READ esk WRITE isk VALENCE 1\n"
+  "	USEION nca READ ncai VALENCE 2\n"
+  "	USEION lca READ lcai VALENCE 2\n"
+  "	USEION tca READ tcai VALENCE 2\n"
+  "	RANGE gsk, gskbar, qinf, qtau, isk\n"
+  "}\n"
+  "\n"
+  "INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}\n"
+  "\n"
+  "PARAMETER {\n"
+  "	celsius=6.3 (degC)\n"
+  "	v		(mV)\n"
+  "	dt		(ms)\n"
+  "	gskbar  (mho/cm2)\n"
+  "	esk	(mV)\n"
+  "	cai (mM)\n"
+  "	ncai (mM)\n"
+  "	lcai (mM)\n"
+  "	tcai (mM)\n"
+  "}\n"
+  "\n"
+  "STATE { q }\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	isk (mA/cm2) gsk (mho/cm2) qinf qtau (ms) qexp\n"
+  "}\n"
+  "\n"
+  "\n"
+  "BREAKPOINT {          :Computes i=g*q^2*(v-esk)\n"
+  "	SOLVE state\n"
+  "        gsk = gskbar * q*q\n"
+  "	isk = gsk * (v-esk)\n"
+  "}\n"
+  "\n"
+  "UNITSOFF\n"
+  "\n"
+  "INITIAL {\n"
+  "	cai = ncai + lcai + tcai	\n"
+  "	rate(cai)\n"
+  "	q=qinf\n"
+  "	VERBATIM\n"
+  "	ncai = _ion_ncai;\n"
+  "	lcai = _ion_lcai;\n"
+  "	tcai = _ion_tcai;\n"
+  "	ENDVERBATIM\n"
+  "}\n"
+  "\n"
+  "\n"
+  "PROCEDURE state() {  :Computes state variable q at current v and dt.\n"
+  "	cai = ncai + lcai + tcai\n"
+  "	rate(cai)\n"
+  "	q = q + (qinf-q) * qexp\n"
+  "	VERBATIM\n"
+  "	return 0;\n"
+  "	ENDVERBATIM\n"
+  "}\n"
+  "\n"
+  "LOCAL q10\n"
+  "PROCEDURE rate(cai) {  :Computes rate and other constants at current v.\n"
+  "	LOCAL alpha, beta, tinc\n"
+  "	q10 = 3^((celsius - 6.3)/10)\n"
+  "		:\"q\" activation system\n"
+  "alpha = 1.25e1 * cai * cai\n"
+  "beta = 0.00025 \n"
+  "\n"
+  ":	alpha = 0.00246/exp((12*log10(cai)+28.48)/-4.5)\n"
+  ":	beta = 0.006/exp((12*log10(cai)+60.4)/35)\n"
+  ": alpha = 0.00246/fctrap(cai)\n"
+  ": beta = 0.006/fctrap(cai)\n"
+  "	qtau = 1 / (alpha + beta)\n"
+  "	qinf = alpha * qtau\n"
+  "	tinc = -dt*q10\n"
+  "	qexp = 1 - exp(tinc/qtau)*q10\n"
+  "}\n"
+  "\n"
+  "UNITSON\n"
+  ;
+#endif

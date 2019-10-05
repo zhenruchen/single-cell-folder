@@ -1,0 +1,27 @@
+////////////////////////////////////////
+// Hipp.hoc
+////////////////////////////////////////
+
+////////  Random initialization of cells membrane potential /////////
+proc custominit() {
+  //for li = 0, Cells.count() -1 {
+  //  for ii = 0, Cells.o(li).count() -1 {
+  //    OriginalVolt = Cells.o(li).o(ii).soma.v
+  //    Cells.o(li).o(ii).setv( rand.normal(OriginalVolt-5, 10) )
+  //   }	
+  //}
+  finitialize()
+}
+
+proc init() {
+  finitialize(v_init)
+  custominit()
+  if (cvode.active()) {
+    cvode.re_init()
+  } else {
+    fcurrent()
+  }
+  frecord_init()
+}
+
+Commands()

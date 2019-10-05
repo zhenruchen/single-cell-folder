@@ -1,0 +1,3 @@
+edge_type_id target_query source_query delay syn_weight target_sections distance_range model_template dynamics_params
+100 pop_name=='EC' pat=='pat1' 0 1 ['soma'] "[0.0, 300]" pyr2pyr NetCon2EC.exc.json
+101 pop_name=='EC' pat=='pat2' 0 1 ['soma'] "[0.0, 300]" pyr2pyr NetCon2EC.exc.json

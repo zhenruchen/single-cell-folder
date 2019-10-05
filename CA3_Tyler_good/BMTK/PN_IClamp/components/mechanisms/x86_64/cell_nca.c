@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* VECTORIZED */
 #define NRN_VECTORIZED 1
 #include <stdio.h>
@@ -92,6 +92,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _extcall_prop = _prop;
@@ -159,7 +168,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "nca",
  "gcabar_nca",
  0,
@@ -217,6 +226,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 14, 4);
   hoc_register_dparam_semantics(_mechtype, 0, "ca_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "ca_ion");
@@ -225,7 +238,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 nca /home/mizzou/Desktop/backup/BLA_SingleCells-master/CA3_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/cell_nca.mod\n");
+ 	ivoc_help("help ?1 nca /home/mizzou/Desktop/single-cell-folder/CA3_Tyler_good/BMTK/PN_IClamp/components/mechanisms/x86_64/cell_nca.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -255,7 +268,7 @@ static int _ode_spec1(_threadargsproto_);
  rate ( _threadargscomma_ v ) ;
  Du = Du  / (1. - dt*( ( ( ( - 1.0 ) ) ) / utau )) ;
  Dz = Dz  / (1. - dt*( ( ( ( - 1.0 ) ) ) / ztau )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  static int states (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) { {
@@ -580,4 +593,108 @@ _first = 0;
 
 #if defined(__cplusplus)
 } /* extern "C" */
+#endif
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/home/mizzou/Desktop/single-cell-folder/CA3_Tyler_good/BMTK/PN_IClamp/components/mechanisms/modfiles/cell_nca.mod";
+static const char* nmodl_file_text = 
+  ":N-type voltage activated Ca current\n"
+  "\n"
+  "NEURON {\n"
+  "    SUFFIX nca\n"
+  "	USEION ca READ eca WRITE ica\n"
+  "	RANGE gcabar, gca\n"
+  "	RANGE uinf, zinf, utau, ztau \n"
+  "}\n"
+  "\n"
+  "UNITS {\n"
+  "    (mA) = (milliamp)\n"
+  "	(mV) = (millivolt)\n"
+  "}\n"
+  "\n"
+  "PARAMETER {\n"
+  "	gcabar = 0.0001 (siemens/cm2) <0,1e9>\n"
+  "}\n"
+  "\n"
+  "STATE { u z }\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	v (mV)\n"
+  "	eca (mV)\n"
+  "	ica (mA/cm2)\n"
+  "	uinf\n"
+  "	zinf \n"
+  "	utau (ms)\n"
+  "	ztau (ms)\n"
+  "	gca (siemens/cm2)\n"
+  "}\n"
+  "\n"
+  "BREAKPOINT { \n"
+  "	SOLVE states METHOD cnexp\n"
+  "	gca = gcabar*u*u*z\n"
+  "	ica = gca*(v-eca)\n"
+  "}\n"
+  "\n"
+  "INITIAL {\n"
+  "	rate(v)\n"
+  "	u = uinf\n"
+  "	z = zinf\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE states {\n"
+  "	rate(v)\n"
+  "	u' = (uinf-u)/utau\n"
+  "	z' = (zinf-z)/ztau\n"
+  "}\n"
+  "FUNCTION ualf(v(mV)) {\n"
+  "	LOCAL va \n"
+  "	va = 19.98-v						:v+25\n"
+  "	if (fabs(va)<1e-04){\n"
+  "		va = va+0.0001\n"
+  "	}\n"
+  "	ualf = 0.19*va/(exp(va/10)-1)\n"
+  "}\n"
+  "\n"
+  "FUNCTION ubet(v(mV)) {\n"
+  "	LOCAL vb \n"
+  "	vb = v\n"
+  "	if (fabs(vb)<1e-04){\n"
+  "		vb = vb+0.0001\n"
+  "	}\n"
+  "	\n"
+  "	ubet = 0.046*(exp(-vb/20.73))\n"
+  "}	\n"
+  "\n"
+  "FUNCTION zalf(v(mV)) {\n"
+  "	LOCAL va \n"
+  "	va = v\n"
+  "	if (fabs(va)<1e-04){\n"
+  "		va = va+0.0001\n"
+  "	}\n"
+  "	\n"
+  "	zalf = 1.6e-4*exp(-va/48.4)\n"
+  "}\n"
+  "\n"
+  "FUNCTION zbet(v(mV)) {\n"
+  "	LOCAL vb \n"
+  "	vb = 39-v\n"
+  "	if (fabs(vb)<1e-04){\n"
+  "		vb = vb+0.0001\n"
+  "	}\n"
+  "	\n"
+  "	zbet = 1/(exp(vb/10)+1)\n"
+  "}\n"
+  "PROCEDURE rate(v(mV)) { LOCAL usum, zsum, ua, ub, za, zb\n"
+  "\n"
+  "	ua = ualf(v) ub = ubet(v) za = zalf(v) zb = zbet(v)\n"
+  "	\n"
+  "	usum = ua+ub\n"
+  "	uinf = ua/usum\n"
+  "	utau = 1/(usum)\n"
+  "	\n"
+  "	zsum = za+zb\n"
+  "	zinf = za/zsum\n"
+  "	ztau = 1/(zsum)\n"
+  "}\n"
+  ;
 #endif

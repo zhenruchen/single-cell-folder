@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -98,6 +98,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -168,7 +177,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "ccanlBC",
  "catau_ccanlBC",
  "caiinf_ccanlBC",
@@ -246,6 +255,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 17, 13);
   hoc_register_dparam_semantics(_mechtype, 0, "nca_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "nca_ion");
@@ -264,7 +277,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ccanlBC /home/mizzou/Desktop/backup/BLA_SingleCells-master/CA3_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/ccanl_BC.mod\n");
+ 	ivoc_help("help ?1 ccanlBC /home/mizzou/Desktop/single-cell-folder/DG_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/ccanl_BC.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -299,7 +312,7 @@ static int _ode_spec1(_threadargsproto_);
  Dncai = Dncai  / (1. - dt*( ( ( ( - 1.0 ) ) ) / catau )) ;
  Dlcai = Dlcai  / (1. - dt*( ( ( ( - 1.0 ) ) ) / catau )) ;
  Dtcai = Dtcai  / (1. - dt*( ( ( ( - 1.0 ) ) ) / catau )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  
@@ -604,3 +617,97 @@ static void _initlists() {
  _slist2[2] = &(tcai) - _p;
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/home/mizzou/Desktop/single-cell-folder/DG_Tyler/BMTK/PN_IClamp/components/mechanisms/modfiles/ccanl_BC.mod";
+static const char* nmodl_file_text = 
+  "COMMENT\n"
+  "	calcium accumulation into a volume of area*depth next to the\n"
+  "	membrane with a decay (time constant tau) to resting level\n"
+  "	given by the global calcium variable cai0_ca_ion\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "NEURON {\n"
+  "	SUFFIX ccanlBC\n"
+  "USEION nca READ ncai, inca, enca WRITE enca, ncai VALENCE 2\n"
+  "USEION lca READ lcai, ilca, elca WRITE elca, lcai VALENCE 2\n"
+  "USEION tca READ tcai, itca, etca WRITE etca, tcai VALENCE 2\n"
+  "RANGE caiinf, catau, cai, ncai, lcai,tcai, eca, elca, enca, etca\n"
+  "}\n"
+  "\n"
+  "UNITS {\n"
+  "        (mV) = (millivolt)\n"
+  "	(molar) = (1/liter)\n"
+  "	(mM) = (milli/liter)\n"
+  "	(mA) = (milliamp)\n"
+  "	FARADAY = 96520 (coul)\n"
+  "	R = 8.3134	(joule/degC)\n"
+  "}\n"
+  "\n"
+  "INDEPENDENT {t FROM 0 TO 100 WITH 100 (ms)}\n"
+  "\n"
+  "PARAMETER {\n"
+  "        celsius = 6.3 (degC)\n"
+  "	depth = 200 (nm)	: assume volume = area*depth\n"
+  "	catau = 9 (ms)\n"
+  "	caiinf = 50.e-6 (mM)	: takes precedence over cai0_ca_ion\n"
+  "			: Do not forget to initialize in hoc if different\n"
+  "			: from this default.\n"
+  "	cao = 2 (mM)\n"
+  "	ica (mA/cm2)\n"
+  "	inca (mA/cm2)\n"
+  "	ilca (mA/cm2)\n"
+  "	itca (mA/cm2)\n"
+  "	cai= 50.e-6 (mM)\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	enca (mV)\n"
+  "	elca (mV)\n"
+  "	etca (mV)\n"
+  "	eca (mV)\n"
+  "}\n"
+  "\n"
+  "STATE {\n"
+  "	ncai (mM)\n"
+  "	lcai (mM)\n"
+  "	tcai (mM)\n"
+  "}\n"
+  "\n"
+  "INITIAL {\n"
+  "	VERBATIM\n"
+  "	ncai = _ion_ncai;\n"
+  "	lcai = _ion_lcai;\n"
+  "	tcai = _ion_tcai; \n"
+  "	ENDVERBATIM\n"
+  "	ncai=caiinf/3\n"
+  "	lcai=caiinf/3\n"
+  "	tcai=caiinf/3\n"
+  "	cai = caiinf	\n"
+  "	eca = ktf() * log(cao/caiinf)	\n"
+  "	enca = eca\n"
+  "	elca = eca\n"
+  "	etca = eca\n"
+  "}\n"
+  "\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE integrate METHOD derivimplicit\n"
+  "	cai = ncai+lcai+tcai	\n"
+  "	eca = ktf() * log(cao/cai)	\n"
+  "	enca = eca\n"
+  "	elca = eca\n"
+  "	etca = eca\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE integrate {\n"
+  "ncai' = -(inca)/depth/FARADAY * (1e7) + (caiinf/3 - ncai)/catau\n"
+  "lcai' = -(ilca)/depth/FARADAY * (1e7) + (caiinf/3 - lcai)/catau\n"
+  "tcai' = -(itca)/depth/FARADAY * (1e7) + (caiinf/3 - tcai)/catau\n"
+  "}\n"
+  "\n"
+  "FUNCTION ktf() (mV) {\n"
+  "	ktf = (1000)*R*(celsius +273.15)/(2*FARADAY)\n"
+  "} \n"
+  ;
+#endif

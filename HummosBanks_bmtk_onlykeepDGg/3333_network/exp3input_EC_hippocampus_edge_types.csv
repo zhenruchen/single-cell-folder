@@ -1,0 +1,2 @@
+edge_type_id target_query source_query syn_weight distance_range dynamics_params target_sections delay model_template
+100 pop_name=='EC' pop_name=='input_EC' 1 "[0.0, 9999]" NetCon2EC.exc.exp3.json ['soma'] 0 pyr2pyr

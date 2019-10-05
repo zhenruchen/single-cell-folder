@@ -1,2 +1,2 @@
-node_type_id cell_name model_type morphology model_template potental
-100 Cell_A biophysical  hoc:DGCell exc
+node_type_id potental model_template cell_name morphology model_type
+100 exc hoc:DGCell Cell_A  biophysical

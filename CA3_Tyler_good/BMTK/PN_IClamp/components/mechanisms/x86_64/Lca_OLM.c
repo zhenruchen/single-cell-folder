@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -90,6 +90,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -182,7 +191,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "lcaOLM",
  "glcabar_lcaOLM",
  0,
@@ -242,6 +251,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 9, 6);
   hoc_register_dparam_semantics(_mechtype, 0, "lca_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "lca_ion");
@@ -252,7 +265,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 lcaOLM /home/mizzou/Desktop/backup/BLA_SingleCells-master/CA3_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/Lca_OLM.mod\n");
+ 	ivoc_help("help ?1 lcaOLM /home/mizzou/Desktop/single-cell-folder/CA3_Tyler_good/BMTK/PN_IClamp/components/mechanisms/x86_64/Lca_OLM.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -450,7 +463,7 @@ static void _hoc_bet(void) {
  static int _ode_matsol1 () {
  rate ( _threadargscomma_ v ) ;
  Dm = Dm  / (1. - dt*( ( ( ( - 1.0 ) ) ) / matu )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  static int state () {_reset=0;
@@ -677,3 +690,120 @@ static void _initlists() {
  _slist1[0] = &(m) - _p;  _dlist1[0] = &(Dm) - _p;
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/home/mizzou/Desktop/single-cell-folder/CA3_Tyler_good/BMTK/PN_IClamp/components/mechanisms/modfiles/Lca_OLM.mod";
+static const char* nmodl_file_text = 
+  "TITLE l-calcium channel\n"
+  ": l-type calcium channel\n"
+  "\n"
+  "\n"
+  "UNITS {\n"
+  "	(mA) = (milliamp)\n"
+  "	(mV) = (millivolt)\n"
+  "	(molar) = (1/liter)\n"
+  "	(mM) = (millimolar)\n"
+  "	FARADAY = 96520 (coul)\n"
+  "	R = 8.3134 (joule/degC)\n"
+  "	KTOMV = .0853 (mV/degC)\n"
+  "}\n"
+  "\n"
+  "PARAMETER {\n"
+  "	v (mV)\n"
+  "	celsius 	(degC)\n"
+  "	glcabar		 (mho/cm2)\n"
+  "	ki=.001 (mM)\n"
+  "	cai (mM)\n"
+  "	cao (mM)\n"
+  "        tfa=1\n"
+  "}\n"
+  "\n"
+  "\n"
+  "NEURON {\n"
+  "	SUFFIX lcaOLM\n"
+  "	USEION lca READ elca WRITE ilca VALENCE 2\n"
+  "	USEION ca READ cai, cao VALENCE 2 \n"
+  "        RANGE glcabar, cai, ilca, elca\n"
+  "        GLOBAL minf,matu\n"
+  "}\n"
+  "\n"
+  "STATE {\n"
+  "	m\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	ilca (mA/cm2)\n"
+  "        glca (mho/cm2)\n"
+  "        minf\n"
+  "        matu   (ms)\n"
+  "	elca (mV)   \n"
+  "\n"
+  "}\n"
+  "\n"
+  "INITIAL {\n"
+  "	rate(v)\n"
+  "	m = minf\n"
+  "	VERBATIM\n"
+  "	cai=_ion_cai;\n"
+  "	ENDVERBATIM\n"
+  "}\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE state METHOD cnexp\n"
+  "	glca = glcabar*m*m*h2(cai)\n"
+  "	ilca = glca*ghk(v,cai,cao)\n"
+  "\n"
+  "}\n"
+  "\n"
+  "FUNCTION h2(cai(mM)) {\n"
+  "	h2 = ki/(ki+cai)\n"
+  "}\n"
+  "\n"
+  "\n"
+  "FUNCTION ghk(v(mV), ci(mM), co(mM)) (mV) {\n"
+  "        LOCAL nu,f\n"
+  "\n"
+  "        f = KTF(celsius)/2\n"
+  "        nu = v/f\n"
+  "        ghk=-f*(1. - (ci/co)*exp(nu))*efun(nu)\n"
+  "}\n"
+  "\n"
+  "FUNCTION KTF(celsius (DegC)) (mV) {\n"
+  "        KTF = ((25./293.15)*(celsius + 273.15))\n"
+  "}\n"
+  "\n"
+  "\n"
+  "FUNCTION efun(z) {\n"
+  "	if (fabs(z) < 1e-4) {\n"
+  "		efun = 1 - z/2\n"
+  "	}else{\n"
+  "		efun = z/(exp(z) - 1)\n"
+  "	}\n"
+  "}\n"
+  "\n"
+  "FUNCTION alp(v(mV)) (1/ms) {\n"
+  "	TABLE FROM -150 TO 150 WITH 200\n"
+  "	alp = 15.69*(-1.0*v+81.5)/(exp((-1.0*v+81.5)/10.0)-1.0)\n"
+  "}\n"
+  "\n"
+  "FUNCTION bet(v(mV)) (1/ms) {\n"
+  "	TABLE FROM -150 TO 150 WITH 200\n"
+  "	bet = 0.29*exp(-v/10.86)\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE state {  \n"
+  "        rate(v)\n"
+  "        m' = (minf - m)/matu\n"
+  "}\n"
+  "\n"
+  "PROCEDURE rate(v (mV)) { :callable from hoc\n"
+  "        LOCAL a\n"
+  "        a = alp(v)\n"
+  "        matu = 1/(tfa*(a + bet(v)))\n"
+  "        minf = tfa*a*matu\n"
+  "}\n"
+  " \n"
+  "\n"
+  "\n"
+  ;
+#endif

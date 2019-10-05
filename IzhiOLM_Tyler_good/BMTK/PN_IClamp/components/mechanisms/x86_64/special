@@ -10,4 +10,4 @@ if test "" = "yes" ; then
 else
 	NRNIV="${NRNBIN}nrniv"
 fi
-"${NRNIV}" -dll "/home/mizzou/Desktop/backup/BLA_SingleCells-master/IzhiECOLM/BMTK/PN_IClamp/components/mechanisms/x86_64/.libs/libnrnmech.so" "$@"
+"${NRNIV}" -dll "/home/mizzou/Desktop/single-cell-folder/IzhiOLM_Tyler_good/BMTK/PN_IClamp/components/mechanisms/x86_64/.libs/libnrnmech.so" "$@"

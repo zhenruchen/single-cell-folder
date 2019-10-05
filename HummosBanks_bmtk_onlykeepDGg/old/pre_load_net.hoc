@@ -1,0 +1,221 @@
+////////////////////////////////////////
+// Hipp.hoc
+////////////////////////////////////////
+
+ACHlevel = 1
+Mods2 = ACHlevel
+
+// the value assigned to the Experiment variable determines which experiment to run as follows:
+// Experiment = 2  // Learn two patterns and test retrieving one of them
+ Experiment = 0  // pattern completion and separation experiment
+// Experiment = 1  // fear conditioning and extinction experiment
+// Experiment = 4   // short experiment for network temporal dynamics used to produce figure 10d
+// Experiment = 3  // testing network stability with increasing amounts of input
+
+strdef expSig // a user defined unique string that gets incorporated into the names of the output files from the simulation, so that they can be easily identified as belonging to this experiment in MATLAB.
+expSig = "full"
+
+objref cvode, fih[2]
+cvode = new CVode()
+
+fih[1]=new FInitializeHandler(0,"Commands()")
+
+proc custominit() {
+  //for li = 0, Cells.count() -1 {
+  //for ii = 0, Cells.o(li).count() -1 {
+  //    OriginalVolt = Cells.o(li).o(ii).soma.v
+  //    Cells.o(li).o(ii).setv( rand.normal(OriginalVolt-5, 10) )
+	      
+  //}
+	
+  //}
+  finitialize()
+}
+
+////////////////////////////////////////
+// Protocol.hoc
+////////////////////////////////////////
+
+if (Experiment ==0) {
+///Stims /////////
+tstop_ = 10000 //Make sure this matches the BMTK tstop!
+StimCount = 16
+StimSpace = tstop_ / StimCount
+StimDurRatio = 250 / StimSpace
+StimSpaceRatio = StimSpace / tstop_
+}
+
+////////////////////////////////////////
+// Protocol.hoc
+////////////////////////////////////////
+
+// 
+// setting up the initial values for neuromodulators and sending commands to change these values at certain times for certain experiments 
+Mods2 = ACHlevel
+
+if (Experiment == 0 || Experiment == 1 || Experiment == 2) {
+ACHe = 2//Mods2
+ACHc = 2//Mods2
+
+Plasticity = 1
+
+ACH2 =Mods2
+Da2 =Mods2
+
+ACH =2
+Da = 2
+
+}
+
+if (Experiment == 3 || Experiment == 4 || Experiment == 5) {
+ACH = Mods2
+
+LearningShutDown_pyr2pyr = 0
+LearningShutDown_inter2pyr = 0
+}
+
+ACH_pyr2pyr = ACH
+DA_pyr2pyr = Da
+ACH_mossy = ACH
+DA_mossy = Da
+ACH_inter2pyr = ACH
+ACH_IZH = ACH
+DA_inter2pyr = Da
+DA_IZH = Da
+
+proc Commands() {
+	if (Experiment == 0) {
+	cvode.event(StimSpace * 5 , "LearningShutDown_pyr2pyr = 0")
+	cvode.event(StimSpace * 5 , "LearningShutDown_inter2pyr = 0")
+	cvode.event(StimSpace * 5 , "LearningShutDown_mossy = 0")
+
+	effectTime = StimSpace * 5
+
+	cvode.event(effectTime , "ACH_IZH = ACH2")
+	cvode.event(effectTime , "ACH_pyr2pyr = ACH2")
+	cvode.event(effectTime , "ACH_mossy = ACH2")
+	cvode.event(effectTime , "ACH_inter2pyr = ACH2")
+
+
+	cvode.event(effectTime , "DA_pyr2pyr = Da2")
+	cvode.event(effectTime , "DA_inter2pyr = Da2")
+	cvode.event(effectTime , "DA_mossy = Da2")
+
+	} else if (Experiment == 1) {
+	effectTime = (CondTrials) * TrialSpace
+		cvode.event(effectTime , "ACH_IZH = 0")
+		cvode.event(effectTime , "ACH_inter2pyr = 0")
+		cvode.event(effectTime , "ACH_pyr2pyr = 0")
+		cvode.event(effectTime , "ACH_pyr2emo = 0")
+		cvode.event(effectTime , "ACH_mossy = 0")
+
+
+	effectTime = (CondTrials + EarlyTestTrials) * TrialSpace
+		cvode.event(effectTime , "ACH_IZH = ACH2")
+		cvode.event(effectTime , "ACH_inter2pyr = ACH2")
+		cvode.event(effectTime , "ACH_pyr2pyr = ACH2")
+		cvode.event(effectTime , "ACH_pyr2emo = ACH2")
+		cvode.event(effectTime , "ACH_mossy = ACH2")
+
+		if (Plasticity == 0) {
+			cvode.event(effectTime , "LearningShutDown_pyr2pyr = 0")
+			cvode.event(effectTime , "LearningShutDown_inter2pyr = 0")
+		}
+
+	effectTime = (CondTrials + EarlyTestTrials + ExtTrials) * TrialSpace
+		cvode.event(effectTime , "LearningShutDown_emo_pyr2pyr = 0")
+		cvode.event(effectTime , "LearningShutDown_emo_inter2pyr = 0")
+
+	effectTime = (CondTrials + EarlyTestTrials + ExtTrials) * TrialSpace
+			cvode.event(effectTime , "ACH_IZH = ACHe")
+			cvode.event(effectTime , "ACH_inter2pyr = ACHe")
+			cvode.event(effectTime , "ACH_pyr2pyr = ACHe")
+			cvode.event(effectTime , "ACH_pyr2emo = ACHe")
+			
+	effectTime = (CondTrials + EarlyTestTrials + ExtTrials + TestTrials) * TrialSpace
+		
+		cvode.event(effectTime , "ACH_IZH = ACHc")
+		cvode.event(effectTime , "ACH_inter2pyr = ACHc")
+		cvode.event(effectTime , "ACH_pyr2pyr = ACHc")
+		cvode.event(effectTime , "ACH_pyr2emo = ACHc")
+			
+
+		} else if (Experiment == 2) {
+
+	cvode.event(StimSpace * 10 , "LearningShutDown_pyr2pyr = 0")
+	cvode.event(StimSpace * 10 , "LearningShutDown_inter2pyr = 0")
+	cvode.event(StimSpace * 10 , "LearningShutDown_mossy = 0")
+
+	effectTime = StimSpace * 10
+
+	cvode.event(effectTime , "ACH_IZH = ACH2")
+	cvode.event(effectTime , "ACH_pyr2pyr = ACH2")
+	cvode.event(effectTime , "ACH_inter2pyr = ACH2")
+	cvode.event(effectTime , "ACH_mossy = ACH2")
+	cvode.event(effectTime , "ACH_pyr2emo = ACH2")
+
+	cvode.event(effectTime , "DA_pyr2pyr = Da2")
+	cvode.event(effectTime , "DA_inter2pyr = Da2")
+	cvode.event(effectTime , "DA_mossy = Da2")
+	}
+}
+
+///UND MORE
+
+// Setting the parameters simulation time step and duration
+dttime  = .1 //.025
+numsteps = 1/dttime
+
+if (Experiment == 0 ) {
+
+tstop = 10000
+} else if(Experiment ==1) {
+
+tstop = 12000
+	if (ExtendedExt >0) {
+		tstop = tstop + (12000/17 ) * ExtendedExt
+	}
+
+} else if (Experiment ==2) {
+
+tstop = 13000
+} else if (Experiment ==3) {
+
+tstop = 15000
+} else if (Experiment ==4) {
+
+tstop = 400
+} else if (Experiment ==5) {
+
+tstop = 3000
+}
+
+v_init = -65
+
+
+	
+
+////////////////////////////////////////
+// Hipp.hoc
+////////////////////////////////////////
+
+wACH = .05 //.1
+
+
+////////////////////////////////////////
+// custominit.hoc
+////////////////////////////////////////
+
+
+proc initt() {
+  finitialize(v_init)
+  custominit()
+  if (cvode.active()) {
+    cvode.re_init()
+  } else {
+    fcurrent()
+  }
+  frecord_init()
+}
+
+Commands()

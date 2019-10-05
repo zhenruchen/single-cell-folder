@@ -1,0 +1,112 @@
+{
+  "target_simulator": "NEURON",
+  "run": {
+    "tstop": 15000.0,
+    "dt": 0.1,
+    "dL": 1000.0,
+    "spike_threshold": 0.0,
+    "nsteps_block": 5000
+  },
+  "conditions": {
+    "celsius": 34.0,
+    "v_init": -65.0
+  },
+  "node_sets": {
+    "virt_poisson_CA3": {
+      "pop_name": "poisson_CA3"
+    },
+    "virt_poisson_DG": {
+      "pop_name": "poisson_DG"
+    },
+    "virt_input_EC": {
+      "pop_name": "input_EC"
+    }
+  },
+  "inputs": {
+    "spikes_poisson_DG": {
+      "input_type": "spikes",
+      "module": "csv",
+      "input_file": "./input/exp3_input_poisson_DG.csv",
+      "node_set": "virt_poisson_DG"
+    },
+    "spikes_input_EC": {
+      "input_type": "spikes",
+      "module": "csv",
+      "input_file": "./input/exp3_input_EC.csv",
+      "node_set": "virt_input_EC"
+    },
+    "spikes_poisson_CA3": {
+      "input_type": "spikes",
+      "module": "csv",
+      "input_file": "./input/exp3_input_poisson_CA3.csv",
+      "node_set": "virt_poisson_CA3"
+    }
+  },
+  "output": {
+    "log_file": "log.txt",
+    "output_dir": "3001_output",
+    "spikes_file": "spikes.h5",
+    "spikes_file_csv": "spikes.csv",
+    "overwrite_output_dir": true
+  },
+  "reports": {
+    "syn_report": {
+      "cells": [
+        0
+      ],
+      "variable_name": "W_ampa",
+      "module": "netcon_report",
+      "sections": "all",
+      "syn_type": "pyr2pyr"
+    }
+  },
+  "network": "3001_network_config.json",
+  "config_path": "C:\\Users\\Tyler\\Desktop\\git_stage\\hippocampus-bmtk\\HummosBanks-bmtk\\3001_simulation_config.json",
+  "config_dir": "C:\\Users\\Tyler\\Desktop\\git_stage\\hippocampus-bmtk\\HummosBanks-bmtk",
+  "components": {
+    "morphologies_dir": "./biophys_components/morphologies",
+    "synaptic_models_dir": "./biophys_components/synaptic_models",
+    "mechanisms_dir": "./biophys_components/mechanisms",
+    "biophysical_neuron_models_dir": "./biophys_components/biophysical_neuron_templates",
+    "point_neuron_models_dir": "./biophys_components/point_neuron_templates",
+    "templates_dir": "./biophys_components/hoc_templates"
+  },
+  "networks": {
+    "nodes": [
+      {
+        "nodes_file": "./3001_network/exp3input_CA3_nodes.h5",
+        "node_types_file": "./3001_network/exp3input_CA3_node_types.csv"
+      },
+      {
+        "nodes_file": "./3001_network/exp3input_DG_nodes.h5",
+        "node_types_file": "./3001_network/exp3input_DG_node_types.csv"
+      },
+      {
+        "nodes_file": "./3001_network/exp3input_EC_nodes.h5",
+        "node_types_file": "./3001_network/exp3input_EC_node_types.csv"
+      },
+      {
+        "nodes_file": "./3001_network/hippocampus_nodes.h5",
+        "node_types_file": "./3001_network/hippocampus_node_types.csv"
+      }
+    ],
+    "edges": [
+      {
+        "edges_file": "./3001_network/exp3input_CA3_hippocampus_edges.h5",
+        "edge_types_file": "./3001_network/exp3input_CA3_hippocampus_edge_types.csv"
+      },
+      {
+        "edges_file": "./3001_network/exp3input_DG_hippocampus_edges.h5",
+        "edge_types_file": "./3001_network/exp3input_DG_hippocampus_edge_types.csv"
+      },
+      {
+        "edges_file": "./3001_network/exp3input_EC_hippocampus_edges.h5",
+        "edge_types_file": "./3001_network/exp3input_EC_hippocampus_edge_types.csv"
+      },
+      {
+        "edges_file": "./3001_network/hippocampus_hippocampus_edges.h5",
+        "edge_types_file": "./3001_network/hippocampus_hippocampus_edge_types.csv"
+      }
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* VECTORIZED */
 #define NRN_VECTORIZED 1
 #include <stdio.h>
@@ -90,6 +90,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _extcall_prop = _prop;
@@ -155,7 +164,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "sAHPOLM",
  "gsAHPbar_sAHPOLM",
  0,
@@ -228,6 +237,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
      _nrn_thread_reg(_mechtype, 1, _thread_mem_init);
      _nrn_thread_reg(_mechtype, 0, _thread_cleanup);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 12, 6);
   hoc_register_dparam_semantics(_mechtype, 0, "k_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "k_ion");
@@ -238,7 +251,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 sAHPOLM /home/mizzou/Desktop/backup/BLA_SingleCells-master/CA3_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/sahp_OLM.mod\n");
+ 	ivoc_help("help ?1 sAHPOLM /home/mizzou/Desktop/single-cell-folder/DG_Tyler/BMTK/PN_IClamp/components/mechanisms/x86_64/sahp_OLM.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -268,7 +281,7 @@ static int _ode_spec1(_threadargsproto_);
  cai = lcai + tcai ;
  rate ( _threadargscomma_ v , cai ) ;
  Dc = Dc  / (1. - dt*( ( ( ( - 1.0 ) ) ) / ctau )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  static int states (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) { {
@@ -563,4 +576,94 @@ _first = 0;
 
 #if defined(__cplusplus)
 } /* extern "C" */
+#endif
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/home/mizzou/Desktop/single-cell-folder/DG_Tyler/BMTK/PN_IClamp/components/mechanisms/modfiles/sahp_OLM.mod";
+static const char* nmodl_file_text = 
+  ":  iC   fast Ca2+/V-dependent K+ channel\n"
+  "\n"
+  "NEURON {\n"
+  "	SUFFIX sAHPOLM\n"
+  "	USEION k READ ek WRITE ik\n"
+  "	USEION lca READ lcai VALENCE 2\n"
+  "	USEION tca READ tcai VALENCE 2\n"
+  "        RANGE ik, gk, gsAHPbar\n"
+  "}\n"
+  "\n"
+  "UNITS {\n"
+  "        (mM) = (milli/liter)\n"
+  "	(mA) = (milliamp)\n"
+  "	(mV) = (millivolt)\n"
+  "}\n"
+  "\n"
+  "PARAMETER {\n"
+  "	gsAHPbar= 0.0001	(mho/cm2)\n"
+  "	cai (mM)\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	v (mV)\n"
+  "	ek (mV)\n"
+  "	lcai (mM)\n"
+  "	tcai (mM)\n"
+  "	ik (mA/cm2)\n"
+  "	cinf \n"
+  "	ctau (ms)\n"
+  "	gk (mho/cm2)\n"
+  "}\n"
+  "\n"
+  "STATE {\n"
+  "	c\n"
+  "}\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE states METHOD cnexp\n"
+  "	gk = gsAHPbar*c       \n"
+  "	ik = gk*(v-ek)\n"
+  "}\n"
+  "\n"
+  "\n"
+  "\n"
+  "INITIAL {\n"
+  "	cai = lcai + tcai\n"
+  "	rate(v,cai)\n"
+  "	c = cinf\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE states {\n"
+  "		cai = lcai + tcai\n"
+  "        rate(v,cai)\n"
+  "	c' = (cinf-c)/ctau\n"
+  "}\n"
+  "\n"
+  "UNITSOFF\n"
+  "\n"
+  "\n"
+  "FUNCTION calf(v (mV), cai (mM)) (/ms) { LOCAL vs, va\n"
+  "	UNITSOFF\n"
+  "	vs=10*log10(1000*cai)\n"
+  "	calf = 0.0048/exp(-0.5*(vs-35))\n"
+  "	UNITSON\n"
+  "}\n"
+  "\n"
+  "FUNCTION cbet(v (mV), cai (mM))(/ms) { LOCAL vs, vb \n"
+  "	UNITSOFF\n"
+  "	  vs=10*log10(1000*cai)\n"
+  "	  cbet = 0.012/exp(0.2*(vs+100))\n"
+  "	UNITSON\n"
+  "}\n"
+  "\n"
+  "UNITSON\n"
+  "\n"
+  "PROCEDURE rate(v (mV), cai (mM)) {LOCAL  csum, ca, cb\n"
+  "	UNITSOFF\n"
+  "	ca=calf(v, cai) \n"
+  "	cb=cbet(v, cai)		\n"
+  "	csum = ca+cb\n"
+  "	cinf = ca/csum\n"
+  "	ctau = 48\n"
+  "	UNITSON\n"
+  "}\n"
+  ;
 #endif
